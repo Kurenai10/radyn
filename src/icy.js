@@ -54,11 +54,17 @@ class IcyParser {
     this.audioLeft = this.metaint;
   }
 
-  push(chunk, onTitle) {
+  /**
+   * @param {Buffer} chunk
+   * @param {(title: string) => void} onTitle  metadata bloğu geldiğinde
+   * @param {(audio: Buffer) => void} [onAudio]  ses verisi parçaları (metadata hariç)
+   */
+  push(chunk, onTitle, onAudio) {
     let pos = 0;
     while (pos < chunk.length) {
       if (this.state === 'audio') {
         const take = Math.min(this.audioLeft, chunk.length - pos);
+        if (onAudio && take > 0) onAudio(chunk.subarray(pos, pos + take));
         pos += take;
         this.audioLeft -= take;
         if (this.audioLeft === 0) this.state = 'length';

@@ -1,0 +1,131 @@
+name: Release
+
+# Bir sürüm etiketi (v1.1.0 gibi) gönderildiğinde Windows ve Linux paketlerini derler,
+# Linux'ta duman testi çalıştırır ve sonuçları GitHub Release'e yükler.
+#
+# Kod imzalama (SmartScreen uyarısını kaldırmak için) isteğe bağlıdır. Aşağıdaki gizli
+# anahtarlar tanımlıysa Windows kurulumu imzalanır; tanımlı değilse imzasız derlenir:
+#   WIN_CSC_LINK          Kod imzalama sertifikasının (.pfx) base64 kodlu hali
+#   WIN_CSC_KEY_PASSWORD  Sertifika parolası
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
+  linux:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Linux paketlerini derle (dizin, AppImage, deb)
+        run: npx electron-builder --linux dir AppImage deb --publish never
+
+      - name: Duman testi (sanal ekranda 30 saniye çalıştır)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          set +e
+          timeout 30 xvfb-run -a ./dist/linux-unpacked/radyn > smoke.log 2>&1
+          code=$?
+          set -e
+          echo "--- uygulama çıktısı (son 60 satır) ---"
+          tail -n 60 smoke.log || true
+          if grep -qi "No usable sandbox\|FATAL" smoke.log; then
+            echo "::error::Electron sandbox hatası verdi"
+            exit 1
+          fi
+          if [ "$code" -ne 124 ]; then
+            echo "::error::Uygulama beklenmedik şekilde kapandı (çıkış kodu $code)"
+            exit 1
+          fi
+          echo "Duman testi geçti: uygulama 30 saniye boyunca hatasız çalıştı."
+
+      - name: Sağlama toplamı (SHA-256)
+        working-directory: dist
+        run: sha256sum *.AppImage *.deb > SHA256SUMS-linux.txt && cat SHA256SUMS-linux.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/SHA256SUMS-linux.txt
+          if-no-files-found: error
+
+  windows:
+    needs: test
+    runs-on: windows-latest
+    env:
+      CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+      CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      - name: Windows kurulum dosyasını derle
+        run: npx electron-builder --win --publish never
+
+      - name: Sağlama toplamı (SHA-256)
+        shell: pwsh
+        run: |
+          Get-ChildItem dist -Filter '*.exe' | ForEach-Object {
+            "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          } | Set-Content -Encoding ascii dist/SHA256SUMS-windows.txt
+          Get-Content dist/SHA256SUMS-windows.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: |
+            dist/*.exe
+            dist/SHA256SUMS-windows.txt
+          if-no-files-found: error
+
+  publish:
+    needs: [linux, windows]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Release oluştur veya güncelle
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          cat release-assets/SHA256SUMS-*.txt > release-assets/SHA256SUMS.txt
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "Radyn ${TAG#v}" --notes-file RELEASE_NOTES.md
+          gh release upload "$TAG" release-assets/* --clobber
+          gh release view "$TAG" --json url --jq .url

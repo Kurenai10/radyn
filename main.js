@@ -14,30 +14,37 @@ const {
   shell,
 } = require('electron');
 const { createRadioApi, sanitizeStation } = require('./src/radio-api');
-const { openIcyMetadata, splitArtistTitle } = require('./src/icy');
+const { splitArtistTitle } = require('./src/icy');
 const { createArtFinder } = require('./src/art');
 const { createStore } = require('./src/store');
 const { createMpris } = require('./src/mpris');
 const { detectCountryCode } = require('./src/geo');
+const { createStreamProxy } = require('./src/stream-proxy');
+const { resolveLang, translate } = require('./src/strings');
 
 const APP_NAME = 'Radyn';
 const ASSETS = path.join(__dirname, 'assets');
 const HLS_URL = /\.m3u8?(\?|$)/i;
+const CONTROL_RE = /^--control=(toggle|play|pause|stop|next|prev)$/;
 
 const radioApi = createRadioApi();
 const artFinder = createArtFinder();
+const streamProxy = createStreamProxy();
 
 let store = null;
 let mainWindow = null;
 let tray = null;
 let mpris = null;
 let isQuitting = false;
+let lang = 'en';
+let pendingControl = parseControl(process.argv);
 
 // Arayüzden gelen oynatma durumu (görev çubuğu, tepsi, MPRIS için)
 let playback = { active: false, status: 'stopped', stationName: '' };
-// ICY metadata: şu an çalan parça
-let metadataStream = null;
+// Şu an çalan parça (ICY veya ID3 metadatası)
 let nowPlaying = { raw: '', artist: '', title: '', artUrl: '' };
+// Her yeni yayın oturumunda artar; eski oturumların metadata olayları yok sayılır
+let streamToken = 0;
 
 const icons = {
   prev: nativeImage.createFromPath(path.join(ASSETS, 'btn-prev.png')),
@@ -45,6 +52,14 @@ const icons = {
   pause: nativeImage.createFromPath(path.join(ASSETS, 'btn-pause.png')),
   next: nativeImage.createFromPath(path.join(ASSETS, 'btn-next.png')),
 };
+
+const t = (key, vars) => translate(lang, key, vars);
+
+/** Komut satırından veya jump list'ten gelen --control=... argümanını okur. */
+function parseControl(argv) {
+  const hit = (argv || []).map((a) => CONTROL_RE.exec(a)).find(Boolean);
+  return hit ? hit[1] : null;
+}
 
 // ---------------------------------------------------------------- Pencere
 
@@ -118,18 +133,50 @@ function sendControl(action) {
 
 // ---------------------------------------------------------------- Görev çubuğu (Windows)
 
-/** Windows görev çubuğunda pencere küçük resminin altında Önceki / Oynat-Durdur / Sonraki düğmeleri. */
+/** Pencere küçük resminde (görev çubuğu önizlemesi) Önceki / Oynat-Durdur / Sonraki düğmeleri. */
 function updateThumbar() {
   if (process.platform !== 'win32' || !mainWindow || mainWindow.isDestroyed()) return;
-  mainWindow.setThumbarButtons([
-    { tooltip: 'Önceki istasyon', icon: icons.prev, click: () => sendControl('prev') },
+  const ok = mainWindow.setThumbarButtons([
+    { tooltip: t('prev'), icon: icons.prev, click: () => sendControl('prev') },
     {
-      tooltip: playback.active ? 'Durdur' : 'Oynat',
+      tooltip: playback.active ? t('stop') : t('play'),
       icon: playback.active ? icons.pause : icons.play,
       click: () => sendControl('toggle'),
     },
-    { tooltip: 'Sonraki istasyon', icon: icons.next, click: () => sendControl('next') },
+    { tooltip: t('next'), icon: icons.next, click: () => sendControl('next') },
   ]);
+  if (ok === false) console.warn('[taskbar] küçük resim düğmeleri eklenemedi');
+  else if (!thumbarLogged) {
+    thumbarLogged = true;
+    console.log('[taskbar] küçük resim düğmeleri ayarlandı:', ok);
+  }
+}
+let thumbarLogged = false;
+
+/** Görev çubuğu simgesinin sağ tık menüsü (Jump List) için hızlı işlemler. */
+function updateJumpList() {
+  if (process.platform !== 'win32') return;
+  // Geliştirme modunda program yolu electron.exe'dir; uygulama yolunu da argümana eklemek gerekir.
+  const extra = app.isPackaged ? [] : [`"${app.getAppPath()}"`];
+  const task = (action, title) => ({
+    type: 'task',
+    program: process.execPath,
+    arguments: [...extra, `--control=${action}`].join(' '),
+    title,
+    description: title,
+    iconPath: process.execPath,
+    iconIndex: 0,
+  });
+  try {
+    const ok = app.setUserTasks([
+      task('toggle', t('menu_toggle')),
+      task('prev', t('menu_prev')),
+      task('next', t('menu_next')),
+    ]);
+    console.log('[taskbar] jump list ayarlandı:', ok);
+  } catch (err) {
+    console.error('Jump List ayarlanamadı:', err.message);
+  }
 }
 
 // ---------------------------------------------------------------- Tepsi (Windows + Linux)
@@ -144,14 +191,14 @@ function createTray() {
 function buildTrayMenu() {
   const visible = mainWindow && mainWindow.isVisible();
   return Menu.buildFromTemplate([
-    { label: visible ? 'Pencereyi gizle' : 'Pencereyi göster', click: toggleWindow },
+    { label: visible ? t('menu_hide') : t('menu_show'), click: toggleWindow },
     { type: 'separator' },
-    { label: playback.active ? 'Durdur' : 'Oynat', click: () => sendControl('toggle') },
-    { label: 'Önceki istasyon', click: () => sendControl('prev') },
-    { label: 'Sonraki istasyon', click: () => sendControl('next') },
+    { label: t('menu_toggle'), click: () => sendControl('toggle') },
+    { label: t('menu_prev'), click: () => sendControl('prev') },
+    { label: t('menu_next'), click: () => sendControl('next') },
     { type: 'separator' },
     {
-      label: 'Çıkış',
+      label: t('menu_quit'),
       click: () => {
         isQuitting = true;
         app.quit();
@@ -166,7 +213,7 @@ function trayTooltip() {
   return `${APP_NAME}\n${playback.stationName}${track}`.slice(0, 127);
 }
 
-/** Pencere başlığı, görev çubuğu düğmeleri, tepsi ve MPRIS'i tek noktadan günceller. */
+/** Pencere başlığı, görev çubuğu düğmeleri, tepsi, jump list ve MPRIS tek noktadan güncellenir. */
 function updateChrome() {
   if (mainWindow && !mainWindow.isDestroyed()) {
     const label = playback.active && playback.stationName ? playback.stationName : APP_NAME;
@@ -220,33 +267,20 @@ function pushAccent() {
   mainWindow?.webContents.send('accent', getAccent());
 }
 
-// ---------------------------------------------------------------- Şu an çalan (ICY)
+// ---------------------------------------------------------------- Şu an çalan
 
 function pushNowPlaying() {
   mainWindow?.webContents.send('nowplaying', nowPlaying);
   updateChrome();
 }
 
-function stopMetadata() {
-  metadataStream?.stop();
-  metadataStream = null;
+function resetNowPlaying() {
   nowPlaying = { raw: '', artist: '', title: '', artUrl: '' };
-}
-
-function startMetadata(url) {
-  stopMetadata();
-  if (HLS_URL.test(url)) {
-    pushNowPlaying();
-    return; // HLS akışlarında ICY metadatası yok
-  }
-  metadataStream = openIcyMetadata(url, {
-    onTitle: handleStreamTitle,
-  });
   pushNowPlaying();
 }
 
 function handleStreamTitle(raw) {
-  if (raw === nowPlaying.raw) return;
+  if (typeof raw !== 'string' || !raw.trim() || raw === nowPlaying.raw) return;
   const { artist, title } = splitArtistTitle(raw);
   nowPlaying = { raw, artist, title, artUrl: '' };
   pushNowPlaying();
@@ -258,10 +292,20 @@ function handleStreamTitle(raw) {
   });
 }
 
+// ---------------------------------------------------------------- Dil
+
+function setLang(next) {
+  lang = resolveLang(next);
+  store?.setSetting('lang', lang);
+  tray?.setContextMenu(buildTrayMenu());
+  updateChrome();
+  updateJumpList();
+}
+
 // ---------------------------------------------------------------- IPC
 
-// Konum oturum boyunca bir kez aranır; sonuç (veya başarısızlık) önbelleğe alınır.
 let homeCountryPromise = null;
+/** Konum oturum boyunca bir kez aranır; sonuç (veya başarısızlık) önbelleğe alınır. */
 function getHomeCountry() {
   homeCountryPromise ??= detectCountryCode({
     localeCountry: () => app.getLocaleCountryCode(),
@@ -285,7 +329,23 @@ function registerIpc() {
     }
   });
 
+  ipcMain.handle('lang:get', () => lang);
+  ipcMain.on('lang:set', (_event, value) => setLang(value));
+
   ipcMain.handle('accent:get', () => getAccent());
+
+  // Yayın: renderer'ın <audio> öğesi bu yerel adrese bağlanır; şarkı bilgisi aynı akıştan gelir.
+  ipcMain.handle('stream:open', async (_event, url) => {
+    const token = ++streamToken;
+    return streamProxy.open(url, {
+      onTitle: (raw) => {
+        if (token === streamToken) handleStreamTitle(raw);
+      },
+    });
+  });
+
+  // HLS yayınlarındaki ID3 metadatası renderer'da okunur ve buraya iletilir.
+  ipcMain.on('metadata:title', (_event, raw) => handleStreamTitle(raw));
 
   ipcMain.on('play:started', (_event, station) => {
     const cleaned = sanitizeStation(station);
@@ -293,12 +353,12 @@ function registerIpc() {
     store.addRecent(cleaned);
     radioApi.registerClick(cleaned.uuid);
     playback.stationName = cleaned.name;
-    startMetadata(cleaned.url);
+    resetNowPlaying();
   });
 
   ipcMain.on('play:stopped', () => {
-    stopMetadata();
-    pushNowPlaying();
+    streamToken++; // bekleyen başlık olayları artık geçersiz
+    resetNowPlaying();
   });
 
   ipcMain.on('state', (_event, state) => {
@@ -309,27 +369,42 @@ function registerIpc() {
     };
     updateChrome();
   });
+
+  // Renderer hazır olunca, uygulama bir jump list komutuyla açıldıysa onu çalıştır.
+  ipcMain.on('renderer:ready', () => {
+    if (pendingControl) {
+      sendControl(pendingControl);
+      pendingControl = null;
+    }
+  });
 }
 
 // ---------------------------------------------------------------- Yaşam döngüsü
 
 function init() {
   store = createStore(path.join(app.getPath('userData'), 'veri.json'));
+  const saved = store.getAll().settings.lang;
+  lang = resolveLang(saved || app.getLocale());
   mpris = createMpris({ onCommand: sendControl });
 
   registerIpc();
   createWindow();
   createTray();
+  updateJumpList();
   registerMediaKeys();
 
   nativeTheme.on('updated', pushAccent);
 }
 
-// Aynı anda ikinci bir kopya açılırsa mevcut pencere öne gelir.
+// Aynı anda ikinci bir kopya açılırsa mevcut pencere öne gelir; jump list komutu ise çalıştırılır.
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', showWindow);
+  app.on('second-instance', (_event, argv) => {
+    const control = parseControl(argv);
+    if (control) sendControl(control);
+    else showWindow();
+  });
 
   app.whenReady().then(init);
 
@@ -340,7 +415,7 @@ if (!app.requestSingleInstanceLock()) {
 
   app.on('before-quit', () => {
     isQuitting = true;
-    stopMetadata();
+    streamProxy.close();
     store?.flush();
   });
 

@@ -1,10 +1,13 @@
 # Radyn
 
-Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtreleri, arama, favoriler ve Windows/Linux görev çubuğu entegrasyonu tek bir hafif uygulamada.
+Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtreleri, arama, favoriler, şu an çalan şarkı bilgisi ve albüm kapağı, Windows görev çubuğu ve Linux masaüstü entegrasyonu.
 
-- **Sürüm:** 1.0.0
-- **Platform:** Windows 10/11 (x64) — test edildi. Linux (x64) — paketler üretildi, çalışma henüz doğrulanmadı.
+- **Sürüm:** 1.1.0
+- **Platform:** Windows 10/11 (x64) · Linux (x64)
+- **Diller:** Türkçe, English, Deutsch, Français, Español
 - **Teknoloji:** Electron 45, düz HTML/CSS/JavaScript arayüzü, Node.js 20+
+
+> Sürüm notları ve indirmeler: [Sürümler sayfası](https://github.com/Kurenai10/radyn/releases) · [RELEASE_NOTES.md](RELEASE_NOTES.md)
 
 ---
 
@@ -14,16 +17,16 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 2. [Ekran düzeni](#ekran-düzeni)
 3. [Kurulum — Windows](#kurulum--windows)
 4. [Kurulum — Linux](#kurulum--linux)
-5. [Kaynak koddan çalıştırma (geliştiriciler)](#kaynak-koddan-çalıştırma-geliştiriciler)
+5. [Kaynak koddan çalıştırma](#kaynak-koddan-çalıştırma)
 6. [Kullanım kılavuzu](#kullanım-kılavuzu)
 7. [Klavye kısayolları](#klavye-kısayolları)
-8. [Verileriniz ve dosya konumları](#verileriniz-ve-dosya-konumları)
-9. [Gizlilik ve ağ trafiği](#gizlilik-ve-ağ-trafiği)
-10. [Hata giderme (sorun çözme)](#hata-giderme-sorun-çözme)
-11. [Hata raporu nasıl hazırlanır](#hata-raporu-nasıl-hazırlanır)
-12. [Geliştirici rehberi](#geliştirici-rehberi)
-13. [Bilinen sınırlamalar](#bilinen-sınırlamalar)
-14. [Sürüm notları](#sürüm-notları)
+8. [Dil seçimi](#dil-seçimi)
+9. [Verileriniz ve dosya konumları](#verileriniz-ve-dosya-konumları)
+10. [Gizlilik ve ağ trafiği](#gizlilik-ve-ağ-trafiği)
+11. [Hata giderme](#hata-giderme)
+12. [Hata raporu nasıl hazırlanır](#hata-raporu-nasıl-hazırlanır)
+13. [Geliştirici rehberi](#geliştirici-rehberi)
+14. [Bilinen sınırlamalar](#bilinen-sınırlamalar)
 
 ---
 
@@ -31,21 +34,21 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 
 | Alan | Ne yapar |
 |---|---|
-| **İstasyon kataloğu** | [Radio Browser](https://www.radio-browser.info/) açık veritabanından 50.000'den fazla istasyon. Yalnızca çalışan kayıtlar (`hidebroken`) listelenir. |
+| **İstasyon kataloğu** | [Radio Browser](https://www.radio-browser.info/) açık veritabanından 50.000'den fazla istasyon. Yalnızca çalışan kayıtlar listelenir. |
 | **Bulunduğum ülke** | Açılışta IP adresinize göre ülkenizi bulur ve o ülkenin istasyonlarını gösterir. |
-| **Ülkeler** | 224 ülke, Türkçe adlarıyla ve istasyon sayısıyla. |
-| **Türler** | pop, rock, jazz, haber, talk gibi en popüler 80 tür. |
-| **Arama** | Dünya genelinde istasyon adına göre arama (en fazla 150 sonuç). |
-| **Favoriler** | ★ ile ekleyin/çıkarın. Kalıcıdır, uygulama kapanınca kaybolmaz. |
-| **Son dinlenenler** | Son 30 istasyon. |
-| **Şu an çalan** | Logo, yayının verdiği **şarkı adı ve sanatçı** (ICY metadatası), bulunursa **albüm kapağı** (iTunes kataloğu). |
-| **Ses** | Ses kaydırıcısı, **sessize alma** (ses simgesi veya `M`). Ses seviyesi kaydedilir. |
-| **Canlı yayın dayanıklılığı** | Bağlantı koparsa 3 kez, artan aralıklarla yeniden bağlanır. |
-| **Görev çubuğu (Windows)** | Pencere küçük resminde Önceki / Oynat-Durdur / Sonraki düğmeleri. |
-| **Tepsi (Windows + Linux)** | Simge menüsü: göster/gizle, oynat/durdur, önceki/sonraki, çıkış. |
+| **Ülkeler ve türler** | 224 ülke (seçili dilde adlarıyla) ve en popüler 80 tür. |
+| **Arama** | Dünya genelinde istasyon adına göre arama. |
+| **Favoriler, son dinlenenler** | Kalıcıdır; uygulama kapanınca kaybolmaz. |
+| **Şu an çalan** | Logo, yayının verdiği **şarkı adı ve sanatçı** (ICY veya HLS ID3 metadatası), bulunursa **albüm kapağı**. |
+| **Tek bağlantı** | Yayın yalnızca bir kez indirilir; şarkı bilgisi aynı akıştan okunur (bant genişliği çift değildir). |
+| **Ses** | Kaydırıcı, **sessize alma** (ses simgesi veya `M`). Ses seviyesi kaydedilir. |
+| **Dayanıklılık** | Bağlantı koparsa üç kez, artan aralıklarla yeniden bağlanır. |
+| **Windows görev çubuğu** | Küçük resim düğmeleri (Önceki / Oynat-Durdur / Sonraki), jump list kısayolları, çalan istasyon adı ipucunda. |
+| **Tepsi** | Göster/gizle, oynat/durdur, önceki/sonraki, çıkış. |
 | **Medya tuşları** | Klavyedeki Oynat/Duraklat, Sonraki, Önceki, Durdur tuşları. |
-| **Linux medya paneli** | MPRIS üzerinden GNOME/KDE medya kontrolü ve kilit ekranı bilgisi. |
-| **Tema** | Windows'un açık/koyu modunu ve vurgu rengini otomatik kullanır. |
+| **Linux masaüstü** | MPRIS ile medya panelinde ve kilit ekranında kontrol. Tek komutla kurulum betiği. |
+| **Diller** | Türkçe, English, Deutsch, Français, Español. Sistem diline göre başlar, değiştirilebilir. |
+| **Tema** | Windows'un açık/koyu modunu ve vurgu rengini kullanır. |
 
 ---
 
@@ -53,7 +56,7 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 
 ```
 ┌───────────────┬──────────────────────────────────────────────────────┐
-│ Radyn         │ Konumunuz: Türkiye                  [ 🔍 Arama ]     │
+│ ◉ Radyn       │ Konumunuz: Türkiye                  [ 🔍 Arama ]     │
 │               │ 500 istasyon                                         │
 │ ● Bulunduğum  │                                                      │
 │   ülke        │  ┌────────┐ ┌────────┐ ┌────────┐                    │
@@ -64,13 +67,14 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 │ KEŞFET        │                                                      │
 │ [Ülkeler|Tür] │                                                      │
 │ ülke listesi  │                                                      │
+│ Dil: Türkçe ▾ │                                                      │
 ├───────────────┴──────────────────────────────────────────────────────┤
 │ [kapak] Şarkı adı          ☆  ⏮  ⏯  ⏭        CANLI · 02:15   🔈 ━━━│
 │         Sanatçı · İstasyon                                           │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-- **Sol kenar çubuğu:** ana kategoriler (Bulunduğum ülke, Popüler, Favoriler, Son dinlenenler) ve ülke/tür gezgini.
+- **Sol kenar çubuğu:** ana kategoriler, ülke/tür gezgini ve dil seçici.
 - **Orta alan:** seçilen kategorinin istasyon kartları. Çalan istasyonun kartında hareketli eşitleyici görünür.
 - **Alt oynatıcı çubuğu:** kapak, şarkı/istasyon bilgisi, favori, oynat/durdur, önceki/sonraki, durum (`CANLI · süre`, `Bağlanıyor…`, `Tamponlanıyor…`, `Bağlantı kurulamadı`), sessize alma ve ses.
 
@@ -81,114 +85,107 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 ### Gereksinimler
 
 - Windows 10 veya Windows 11, 64-bit
-- Yaklaşık 400 MB boş alan (kurulum sonrası)
-- İnternet bağlantısı (radyo yayınları ve katalog için)
+- Yaklaşık 400 MB boş alan
+- İnternet bağlantısı
 
 ### Adımlar
 
-1. [Sürüm sayfasından](https://github.com/Kurenai10/radyn/releases/tag/v1.0.0) **`Radyn.Setup.1.0.0.exe`** dosyasını indirin. (GitHub, dosya adındaki boşlukları noktaya çevirir; indirdiğiniz ad bu olabilir.)
-2. Dosyaya çift tıklayın. Windows **"Windows PC'nizi korudu"** uyarısı gösterirse:
-   - **Ek bilgi** bağlantısına tıklayın,
-   - **Yine de çalıştır** düğmesine basın.
+1. [Sürümler sayfasından](https://github.com/Kurenai10/radyn/releases/latest) **`Radyn-Setup-1.1.0.exe`** dosyasını indirin.
+2. Dosyaya çift tıklayın. Windows **"Windows PC'nizi korudu"** uyarısı gösterirse **Ek bilgi → Yine de çalıştır** seçin.
 
-   > Bu uyarı, kurulum dosyasının dijital olarak imzalanmamış olmasından kaynaklanır. Uyarının görünmesi tek başına bir zararlı yazılım göstergesi değildir; ancak dosyanın bütünlüğünü doğrulamak isterseniz [SHA-256 özetini](#sha-256-doğrulaması) kontrol edin.
-3. Kurulum sihirbazı kullanıcı klasörüne kurar (yönetici izni gerekmez). Varsayılan konum:
-   `%LOCALAPPDATA%\Programs\Radyn`
-4. Kurulum sonunda **Radyn**'i Başlat menüsünden veya masaüstü kısayolundan açın.
+   > Bu uyarı, kurulum dosyasının güvenilir bir sertifika ile imzalanmamış olmasından kaynaklanır. Kod imzalama yapılandırıldığında (bkz. [Kod imzalama](#kod-imzalama-smartscreen)) uyarı kalkar. Dosyanın bütünlüğünü [SHA-256 özetiyle](#sha-256-doğrulaması) doğrulayabilirsiniz.
+3. Kurulum kullanıcı klasörüne yapılır, yönetici izni gerekmez: `%LOCALAPPDATA%\Programs\Radyn`.
+4. Radyn'i Başlat menüsünden veya masaüstü kısayolundan açın.
 
 ### Kaldırma
 
-**Ayarlar → Uygulamalar → Radyn → Kaldır**. Favorileriniz ve ayarlarınız (`%APPDATA%\Radyn`) kaldırmada otomatik silinmeyebilir; tamamen temizlemek için bu klasörü de silin.
+**Ayarlar → Uygulamalar → Radyn → Kaldır**. Favoriler ve ayarlar (`%APPDATA%\Radyn`) otomatik silinmeyebilir; tamamen temizlemek için bu klasörü de silin.
 
 ### SHA-256 doğrulaması
 
-PowerShell'de:
+Her sürümde `SHA256SUMS.txt` dosyası yayınlanır. PowerShell'de:
 
 ```powershell
-Get-FileHash ".\Radyn.Setup.1.0.0.exe" -Algorithm SHA256
+Get-FileHash ".\Radyn-Setup-1.1.0.exe" -Algorithm SHA256
 ```
 
-Çıktı, sürüm notlarında yayınlanan özetle aynı olmalıdır.
+Çıktı, `SHA256SUMS.txt` içindeki Windows satırıyla aynı olmalıdır.
 
 ---
 
 ## Kurulum — Linux
 
-Linux için iki yol vardır: **kaynak koddan çalıştırma** (en kolay ve test edilmiş yol) ve **paketli kurulum**.
+Linux'ta üç yol vardır: **tek komutla kurulum** (önerilen), **AppImage/.deb'i elle kurmak** ve **kaynak koddan çalıştırma**.
 
-### Gereksinimler
+### Yol A — Tek komutla kurulum (önerilen)
 
-- 64-bit Linux. Belirli dağıtımlar test edilmedi; Electron'u destekleyen güncel dağıtımlarda çalışması beklenir.
-- Node.js 20 veya üzeri, npm
-- Masaüstü ortamı (GNOME, KDE, XFCE vb.)
-- MPRIS için: DBus oturumu (masaüstü ortamlarında varsayılan olarak bulunur)
-- Electron'un ihtiyaç duyduğu sistem kütüphaneleri (bkz. [Hata giderme](#hata-giderme-sorun-çözme): *"error while loading shared libraries"*)
-
-### Yol A — Kaynak koddan çalıştırma
+Depodaki `install-radyn.sh` betiği en son sürümün AppImage dosyasını indirir, SHA-256 özetini doğrular ve kurar:
 
 ```bash
-# 1) Node.js kurulu mu?
-node -v        # v20 veya üzeri olmalı
+# Betiği indirin
+curl -fsSLO https://raw.githubusercontent.com/Kurenai10/radyn/main/install-radyn.sh
 
-# 2) Proje klasörüne girin
+# Kurun (kök yetkisi gerekmez)
+bash install-radyn.sh
+```
+
+Betik şunları yapar:
+
+- En son sürümü bulur ve `Radyn-1.1.0.AppImage` dosyasını indirir.
+- `SHA256SUMS.txt` ile özeti doğrular; eşleşmezse kurulumu durdurur.
+- `~/.local/share/radyn/Radyn.AppImage` olarak kurar ve `~/.local/bin/radyn` komutunu oluşturur.
+- Uygulama menüsüne **Radyn** kısayolu ekler (`~/.local/share/applications/radyn.desktop`).
+
+Belirli bir sürümü kurmak için: `bash install-radyn.sh --version v1.1.0`
+Kaldırmak için: `bash install-radyn.sh --uninstall` (favoriler ve ayarlar `~/.config/Radyn` içinde korunur)
+
+AppImage için gereken `libfuse2` yoksa betik bunu bildirir ve uygulamayı FUSE gerektirmeden açılacak şekilde ayarlar.
+
+### Yol B — AppImage veya .deb'i elle kurmak
+
+Sürümler sayfasından dosyayı indirin ve `SHA256SUMS.txt` ile doğrulayın:
+
+```bash
+sha256sum -c SHA256SUMS.txt --ignore-missing
+
+# AppImage
+chmod +x Radyn-1.1.0.AppImage
+./Radyn-1.1.0.AppImage
+
+# .deb (Debian/Ubuntu)
+sudo apt install ./radyn_1.1.0_amd64.deb
+```
+
+### Yol C — Kaynak koddan çalıştırma
+
+```bash
+# Node.js 20+ gerekir
 cd /ruta/proje-klasoru
-
-# 3) Bağımlılıkları kurun (Electron ikilisi de indirilir)
 npm install
-
-# 4) Başlatın
 npm start
 ```
 
-### Yol B — Paketli kurulum (uygulama menüsüne eklemek için)
+### Linux'a özgü notlar
 
-```bash
-# Paketlenmiş klasörü üretin (dist/linux-unpacked)
-npx electron-builder --linux dir
-
-# Kullanıcı dizinine kurun (kök yetkisi gerekmez)
-./scripts/install-linux.sh
-
-# Çalıştırın
-~/.local/share/radyn/radyn
-```
-
-Kurulum betiği şunları yapar: uygulamayı `~/.local/share/radyn` altına kopyalar, `chrome-sandbox` ve `radyn` dosyalarına çalıştırma izni verir, simgeyi `~/.local/share/icons` altına koyar ve `~/.local/share/applications/radyn.desktop` masaüstü girişini oluşturur.
-
-Kaldırmak için:
-
-```bash
-rm -rf ~/.local/share/radyn ~/.local/share/applications/radyn.desktop ~/.local/share/icons/hicolor/512x512/apps/radyn.png
-```
-
-### Yol C — AppImage veya .deb (Linux'ta üretilir)
-
-```bash
-npm run dist:linux     # dist/ içinde Radyn-1.0.0.AppImage ve radyn_1.0.0_amd64.deb
-```
-
-- **AppImage:** `chmod +x Radyn-1.0.0.AppImage` ve çift tıklayın ya da `./Radyn-1.0.0.AppImage` ile çalıştırın.
-- **.deb:** `sudo apt install ./radyn_1.0.0_amd64.deb`
-
-> AppImage ve .deb dosyaları Windows'ta üretilemez; Linux'ta derlemeniz gerekir.
+- **Medya kontrolü:** MPRIS üzerinden GNOME/KDE medya panelinde ve kilit ekranında çalışır.
+- **Tepsi:** GNOME'da simge görünmesi için **AppIndicator and KStatusNotifierItem Support** eklentisi gerekir. Eklenti yoksa da uygulama açılır; ikinci kopya açmak pencereyi öne getirir.
+- **Sandbox:** Ubuntu 24.04 ve benzeri dağıtımlar Electron'un sandbox'ını kısıtlayabilir (`No usable sandbox`). Sürüm derlemeleri bu nedenle sürekli entegrasyon ortamında duman testinden geçer. `--no-sandbox` bayrağı güvenliği düşürdüğü için varsayılan olarak kullanılmaz.
 
 ---
 
-## Kaynak koddan çalıştırma (geliştiriciler)
+## Kaynak koddan çalıştırma
 
 ```powershell
-# Windows (PowerShell)
 cd C:\Users\Admin\Documents\radio
 npm install
 npm start          # uygulamayı açar; hatalar bu terminale yazılır
-npm test           # 28 birim/entegrasyon testi
+npm test           # 37 birim ve entegrasyon testi
 npm run icons      # ikonları assets/ klasörüne yeniden üretir
 ```
 
-`npm install` sırasında Electron ikilisi indirilir. Ağınız GitHub'a erişmiyorsa veya indirme yarıda kalırsa:
+`npm install` sırasında Electron ikilisi indirilir. Ağınız GitHub'a erişmiyorsa:
 
 ```powershell
-# İndirme aynasını belirtin (kurumsal ağ / yavaş bağlantı)
 $env:ELECTRON_MIRROR = "https://kurumsal-ayna-adresiniz/electron/"   # kendi ayna adresinizi yazın
 npm install
 ```
@@ -201,47 +198,45 @@ Ya da `node_modules\electron` klasörünü silip `npm install` komutunu yeniden 
 
 ### 1. İlk açılış
 
-Uygulama açılınca **"Bulunduğum ülke"** görünümü gelir. IP adresinizden ülkenizi bulur ve o ülkenin istasyonlarını listeler. Ülke bulunamazsa veya o ülkede istasyon yoksa **Popüler** listesi açılır.
+Uygulama **"Bulunduğum ülke"** görünümüyle açılır: IP adresinizden ülkenizi bulur ve o ülkenin istasyonlarını listeler. Ülke bulunamazsa veya o ülkede istasyon yoksa **Popüler** listesi açılır.
 
 ### 2. Ülke ve tür ile gezinme
 
-- Sol alttaki **Ülkeler** sekmesinden bir ülkeye tıklayın; listedeki istasyonlar o ülkenin en çok oy alanlarıdır.
-- **Türler** sekmesine geçip `jazz`, `news`, `pop` gibi bir türe tıklayın.
-- Listenin üstündeki **"Listede ara…"** kutusu ülke/tür adını filtreler.
+- **Ülkeler** sekmesinden bir ülkeye tıklayın; liste o ülkenin en çok oy alan istasyonlarıdır.
+- **Türler** sekmesinde `jazz`, `news`, `pop` gibi bir türe tıklayın.
+- Liste üstündeki filtre kutusu ülke/tür adını süzer.
 
 ### 3. Arama
 
-Üst sağdaki arama kutusuna istasyon adını yazıp Enter'a basın (ya da `Ctrl+F` ile kutuya gidin). Sonuçlar dünya genelindendir.
+Üst sağdaki kutuya istasyon adını yazıp Enter'a basın (ya da `Ctrl+F` ile kutuya gidin). Sonuçlar dünya genelindendir.
 
 ### 4. Bir istasyonu çalmak
 
 - Karta tıklayın veya kart odaktayken Enter'a basın.
-- Alt çubuktaki **⏯** düğmesi, çalan istasyonu durdurur; durmuş istasyonda aynı düğme yeniden başlatır.
+- **⏯** düğmesi çalan istasyonu durdurur; durmuş istasyonda yeniden başlatır.
 - **⏮ / ⏭** düğmeleri, istasyonun bulunduğu liste içinde önceki/sonraki istasyona geçer.
-
-Durum satırında şunları görürsünüz:
 
 | Durum | Anlamı |
 |---|---|
 | `Bağlanıyor…` | Yayına bağlanılıyor |
 | `Tamponlanıyor…` | Veri bekleniyor (ağ yavaş olabilir) |
-| `CANLI · 02:15` | Yayın çalıyor, süre bu oturumdan beri |
-| `Bağlantı kurulamadı` | 3 yeniden deneme de başarısız oldu — [hata giderme](#istasyon-bağlantı-kurulamadı-diyor) |
+| `CANLI · 02:15` | Yayın çalıyor; süre bu oturumdan beri |
+| `Bağlantı kurulamadı` | Üç yeniden deneme de başarısız oldu — [hata giderme](#istasyon-bağlantı-kurulamadı-diyor) |
 | `Durduruldu` | Yayın durduruldu |
 
 ### 5. Şu an çalan parça
 
-Yayın şarkı bilgisi gönderiyorsa alt çubukta **şarkı adı** ve **sanatçı** görünür. Uygulama bu bilgiyle iTunes kataloğunda eşleşen bir albüm kapağı arar; bulunursa kapak gösterilir, bulunamazsa istasyon logosu gösterilir.
+Yayın şarkı bilgisi gönderiyorsa alt çubukta **şarkı adı** ve **sanatçı** görünür (ICY metadatası; HLS yayınlarda ID3 etiketi). Uygulama bu bilgiyle iTunes kataloğunda eşleşen bir **albüm kapağı** arar; bulunursa gösterilir, bulunamazsa istasyon logosu gösterilir.
 
 ### 6. Favoriler ve son dinlenenler
 
-- Kartın sağ üstündeki **☆** ile favoriye ekleyin; **★** ile çıkarın. Alt çubuktaki ★ de çalan istasyon için çalışır.
-- **Favoriler** ve **Son dinlenenler** menüsü kalıcıdır.
+- Kartın sağ üstündeki **☆** ile favoriye ekleyin, **★** ile çıkarın. Alt çubuktaki ★ çalan istasyon için çalışır.
+- **Favoriler** ve **Son dinlenenler** kalıcıdır (son 30 istasyon).
 
 ### 7. Ses ve sessize alma
 
 - Alt çubuktaki kaydırıcı ses seviyesini ayarlar.
-- Ses simgesine tıklayın veya **`M`** tuşuna basın: ses kapanır, simge kapalı-ses olur. Tekrar basınca ses, kaydırıcının kaldığı seviyeden açılır.
+- Ses simgesine tıklayın veya **`M`** tuşuna basın: ses kapanır; tekrar basınca kaydırıcının kaldığı seviyeden açılır.
 - Kaydırıcıyı oynatmak da sesi açar.
 
 ### 8. Pencere, tepsi ve çıkış
@@ -249,15 +244,16 @@ Yayın şarkı bilgisi gönderiyorsa alt çubukta **şarkı adı** ve **sanatç�
 - Pencerenin **X** düğmesi uygulamayı **kapatmaz**; tepsiye küçülür ve yayın kesilmez.
 - Tepsi simgesine tek tıklama pencereyi açar/gizler.
 - Tamamen çıkmak için tepsi simgesine sağ tıklayın → **Çıkış**.
-- Uygulamayı ikinci kez açmaya çalışırsanız mevcut pencere öne gelir (ikinci kopya açılmaz).
+- Uygulama ikinci kez açılırsa mevcut pencere öne gelir.
 
 ### 9. Windows görev çubuğu
 
-Radyn açıkken görev çubuğundaki simgenin üzerine gelin; pencere önizlemesinin altında **Önceki**, **Oynat/Durdur** ve **Sonraki** düğmeleri görünür. Düğme simgesi çalan duruma göre değişir ve görev çubuğu ipucunda çalan istasyon adı yazar.
+- **Küçük resim düğmeleri:** Görev çubuğundaki Radyn simgesinin üzerine gelin; önizlemenin altında **Önceki**, **Oynat/Durdur** ve **Sonraki** düğmeleri görünür. Oynat/Durdur simgesi çalan duruma göre değişir ve görev çubuğu ipucunda çalan istasyon adı yazar.
+- **Jump list (sağ tık menüsü):** Görev çubuğundaki Radyn simgesine sağ tıklayın; **Oynat / Durdur**, **Önceki istasyon** ve **Sonraki istasyon** görevleri bulunur. Uygulama kapalıysa bu görev uygulamayı açar ve komutu çalıştırır.
 
 ### 10. Medya tuşları
 
-Klavyenizdeki **Oynat/Duraklat**, **Sonraki**, **Önceki** ve **Durdur** tuşları, uygulama açıkken (pencere gizli olsa bile) yayını kontrol eder. Başka bir medya uygulaması aynı tuşları kullanıyorsa [hata giderme](#medya-tuşları-çalışmıyor) bölümüne bakın.
+Klavyenizdeki **Oynat/Duraklat**, **Sonraki**, **Önceki** ve **Durdur** tuşları, uygulama açıkken pencere gizli olsa bile yayını kontrol eder.
 
 ---
 
@@ -274,6 +270,15 @@ Klavyenizdeki **Oynat/Duraklat**, **Sonraki**, **Önceki** ve **Durdur** tuşlar
 
 ---
 
+## Dil seçimi
+
+- Uygulama işletim sisteminizin dilinden başlar: Türkçe, Deutsch, Français, Español veya English. Desteklenmeyen dillerde English kullanılır.
+- Kenar çubuğunun altındaki **Dil / Language** seçiciden değiştirebilirsiniz; seçim anında uygulanır ve kaydedilir.
+- Görev çubuğu düğmeleri, jump list ve tepsi menüsü de seçilen dili kullanır.
+- Ülke adları seçili dile göre yeniden çevrilir. İstasyon adları ve türler kataloğun orijinal metnidir.
+
+---
+
 ## Verileriniz ve dosya konumları
 
 Radyn hesap istemez; her şey yerel olarak saklanır. Kalıcı veriler tek bir JSON dosyasındadır:
@@ -283,227 +288,183 @@ Radyn hesap istemez; her şey yerel olarak saklanır. Kalıcı veriler tek bir J
 | Windows | `%APPDATA%\Radyn\veri.json` |
 | Linux | `~/.config/Radyn/veri.json` |
 
-Dosyanın yapısı:
-
 ```json
 {
   "favorites": [ { "uuid": "...", "name": "...", "url": "...", "favicon": "...", "country": "...", "countryCode": "TR", "tags": [], "codec": "MP3", "bitrate": 128 } ],
   "recent": [ ],
-  "settings": { "volume": 0.8 }
+  "settings": { "volume": 0.8, "lang": "tr" }
 }
 ```
 
-- **Favorileri yedeklemek:** `veri.json` dosyasını kopyalayın.
-- **Her şeyi sıfırlamak:** Radyn'i kapatın, `veri.json` dosyasını silin, uygulamayı yeniden açın.
-- **Bozuk dosya:** JSON okunamazsa Radyn varsayılan boş verilerle açılır; bir sonraki kayıtta dosya yeniden yazılır. Bozuk dosyayı silmeden önce yedeğini almak isterseniz dosyayı başka bir yere kopyalayın.
+- **Yedeklemek:** `veri.json` dosyasını kopyalayın.
+- **Sıfırlamak:** Radyn'i kapatın, `veri.json` dosyasını silin, uygulamayı yeniden açın.
+- **Bozuk dosya:** JSON okunamazsa Radyn varsayılan verilerle açılır; bir sonraki kayıtta dosya yeniden yazılır. Silmeden önce yedeğini alın.
 
 ---
 
 ## Gizlilik ve ağ trafiği
 
-Radyn şu dış servislere bağlanır. Her birinin ne gördüğünü bilmeniz için listeledik:
-
 | Servis | Ne zaman | Gönderilen |
 |---|---|---|
-| `de1/nl1/at1.api.radio-browser.info` | Katalog, ülke/tür listeleri, arama, tıklama sayacı | İstek parametreleri (ülke kodu, arama metni) ve istasyon kimliği (tıklama sayacı için) |
+| `de1/nl1/at1.api.radio-browser.info` | Katalog, ülke/tür listeleri, arama, tıklama sayacı | İstek parametreleri (ülke kodu, arama metni) ve istasyon kimliği (sayaç için) |
 | `ipapi.co`, `ipwho.is` | Açılışta, oturum başına bir kez | **IP adresiniz** (servis tarafından görülür); yanıt olarak yalnızca ülke kodu alınır |
 | `itunes.apple.com` | Yeni bir şarkı bilgisi geldiğinde | Sanatçı ve şarkı adı (kapak aramak için) |
-| Yayın sunucuları (istasyonun kendi adresi) | Çalınan istasyon | Standart HTTP/HLS istekleri; ICY metadatası için ikinci bir bağlantı |
+| Yayın sunucusu (istasyonun kendi adresi) | Çalınan istasyon | Standart HTTP veya HLS istekleri |
 
-Radyn hesap, izleme veya telemetri içermez. Konum sorgusu açılışta yapılır. Şu an bunu kapatan bir ayar yoktur; kaynak koddan çalışıyorsanız `renderer/app.js` içindeki `init` fonksiyonunda `showView('home')` çağrısını `showView('top')` ile değiştirirseniz açılışta IP sorgusu yapılmaz (**Bulunduğum ülke** menüsüne tıklamadığınız sürece).
+- Yayın, uygulamanın kendi makinesindeki `127.0.0.1` üzerindeki aktarıcıdan geçer; bu trafik dışarıya çıkmaz.
+- Radyn hesap, izleme veya telemetri içermez.
+- Konum sorgusu açılışta yapılır. Şu an bunu kapatan bir ayar yoktur; kaynak koddan çalışıyorsanız `renderer/app.js` içindeki `init` fonksiyonunda `showView('home')` çağrısını `showView('top')` ile değiştirirseniz açılışta IP sorgusu yapılmaz.
 
 ---
 
-## Hata giderme (sorun çözme)
+## Hata giderme
 
-Aşağıdaki başlıklar, uygulamanın gösterdiği mesajlara veya belirtilere göre düzenlenmiştir. Bir sorun için önce ilgili başlığa bakın; çözülmezse [hata raporu](#hata-raporu-nasıl-hazırlanır) bölümündeki bilgileri toplayın.
+Bir sorun için önce ilgili başlığa bakın. Çözülmezse [hata raporu](#hata-raporu-nasıl-hazırlanır) bölümündeki bilgileri toplayın.
 
 ### Kurulum ve başlatma
 
 #### "Windows PC'nizi korudu" uyarısı çıkıyor
-Kurulum dosyası dijital olarak imzalanmamış. **Ek bilgi → Yine de çalıştır** ile devam edebilirsiniz. Bütünlüğü doğrulamak için [SHA-256 özetini](#sha-256-doğrulaması) karşılaştırın.
+Kurulum dosyası sertifikayla imzalanmamış. **Ek bilgi → Yine de çalıştır** ile devam edebilirsiniz. Dosyanın bütünlüğünü [SHA-256 özetiyle](#sha-256-doğrulaması) doğrulayın.
 
-#### Kurulum sırasında "Bu uygulama bilgisayarınızda değişiklik yapmasına izin vermiyor"
-Kurulum kullanıcı klasörüne yapıldığı için yönetici izni gerekmez. Dosyayı sağ tıklayıp **Yönetici olarak çalıştır** yerine düz çift tıklama ile deneyin. Hâlâ engelleniyorsa antivirüs yazılımınızın karantina kaydına bakın.
+#### `npm install` Electron indirirken takılıyor ya da hata veriyor
+`ETIMEDOUT`, `ECONNRESET` veya `Electron failed to install correctly` görüyorsanız: ağ bağlantınızı ve proxy ayarlarını kontrol edin, `ELECTRON_MIRROR` ile bir ayna kullanın ya da `node_modules` klasörünü silip yeniden kurun.
 
-#### `npm install` Electron indirirken takılıyor ya da hata veriyor (`ETIMEDOUT`, `ECONNRESET`, `Electron failed to install correctly`)
-- Ağ bağlantınızı kontrol edin; kurumsal ağda proxy ayarlarını yapın.
-- `ELECTRON_MIRROR` ile bir ayna kullanın (bkz. [Kaynak koddan çalıştırma](#kaynak-koddan-çalıştırma-geliştiriciler)).
-- Yarıda kalan kurulumu temizleyin: `node_modules` klasörünü silin ve `npm install` komutunu yeniden çalıştırın.
-
-#### `npm start` "electron.exe bulunamadı" veya "Electron failed to install correctly" diyor
-`node_modules\electron` klasörü eksik ya da bozuk. Silip yeniden kurun:
-
+#### `npm start` "electron.exe bulunamadı" diyor
 ```powershell
 Remove-Item -Recurse -Force node_modules\electron
 npm install
 ```
 
-#### Linux: `error while loading shared libraries: libXXX.so.N: cannot open shared object file`
-Electron'un ihtiyaç duyduğu bir sistem kütüphanesi yok. Dağıtımınıza göre eksik paketi kurun. Debian/Ubuntu için sık görülen paketler:
+#### Linux: `error while loading shared libraries: libXXX.so.N`
+Bir sistem kütüphanesi eksik. Debian/Ubuntu için sık görülen paketler:
 
 ```bash
 sudo apt install libnss3 libatk-bridge2.0-0 libgtk-3-0 libasound2 libxss1 libgbm1 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2
 ```
 
-Hata mesajındaki `libXXX.so` adını arayıp (ör. `apt search libxxx`) paketi bulabilirsiniz.
+Hata mesajındaki `libXXX.so` adını arayıp (`apt search libxxx`) paketi bulabilirsiniz.
 
-#### Linux: `The SUID sandbox helper binary was found, but is not configured correctly`
-`chrome-sandbox` dosyasının izinleri yanlış. Kurulum betiği bunu düzeltir; elle yapmak için:
+#### Linux: `No usable sandbox!` veya uygulama açılmadan kapanıyor
+Ubuntu 23.10/24.04 gibi dağıtımlar kullanıcı ad alanlarını AppArmor ile kısıtlayabilir. Güvenli çözüm, sistem yöneticinizle birlikte Electron için bir AppArmor profili tanımlamaktır. `--no-sandbox` bayrağı güvenliği düşürdüğü için yalnızca kendi makinenizde ve bilerek kullanın.
 
+#### Linux: `Permission denied`
 ```bash
-sudo chown root:root ~/.local/share/radyn/chrome-sandbox
-sudo chmod 4755 ~/.local/share/radyn/chrome-sandbox
+chmod +x ~/.local/share/radyn/Radyn.AppImage
 ```
+(Tek komutla kurulum betiğini kullandıysanız betik izinleri zaten ayarlar.)
 
-#### Linux: `No usable sandbox!` veya Electron açılmadan kapanıyor
-Ubuntu 23.10/24.04 gibi dağıtımlar, kullanıcı ad alanlarını (user namespaces) AppArmor ile kısıtlayabilir. Önerilen çözüm, Electron için bir AppArmor profili tanımlamak veya sistem yöneticinizle birlikte ilgili ayarı değerlendirmektir. `--no-sandbox` bayrağı güvenliği düşürdüğü için **varsayılan olarak kullanılmamalıdır**; kullanmanız gerekiyorsa yalnızca kendi makinenizde ve bilerek yapın.
+#### Linux: AppImage açılmıyor, `fuse` hatası veriyor
+`libfuse2` eksik: `sudo apt install libfuse2` (Debian/Ubuntu) veya `sudo dnf install fuse-libs` (Fedora). Geçici olarak şöyle açabilirsiniz: `APPIMAGE_EXTRACT_AND_RUN=1 ./Radyn-1.1.0.AppImage`
 
-#### Linux: `Permission denied` ile açılmıyor
-Çalıştırma izni yok:
-
-```bash
-chmod +x ~/.local/share/radyn/radyn ~/.local/share/radyn/chrome-sandbox
-```
+#### Linux: `SHA-256 doğrulaması BAŞARISIZ`
+Dosya indirme sırasında bozulmuş ya da değiştirilmiş olabilir. Betik kurulumu durdurdu; tekrar deneyin. Sorun sürerse sürüm sayfasından dosyayı elle indirip `SHA256SUMS.txt` ile karşılaştırın ve bir hata raporu açın.
 
 #### Uygulama açılıyor ama hemen kapanıyor
-Sorunu görmek için uygulamayı terminalden başlatın (`npm start` veya kurulu sürüm için `"%LOCALAPPDATA%\Programs\Radyn\Radyn.exe"` Windows'ta PowerShell'den; Linux'ta `~/.local/share/radyn/radyn`). Terminaldeki hata satırı çoğu zaman nedeni gösterir.
+Terminalden başlatın (Windows: PowerShell'de `"%LOCALAPPDATA%\Programs\Radyn\Radyn.exe"`; Linux: `radyn`). Terminaldeki hata satırı çoğu zaman nedeni gösterir.
 
-#### Başka bir Radyn penceresi açılmıyor, mevcut pencere öne gelmiyor
-Uygulama zaten çalışıyor olabilir ama tepsidedir. Tepsi simgesine tıklayın; ya da görev yöneticisinde `Radyn` süreçlerini sonlandırıp yeniden açın.
+#### Uygulama zaten açık ama pencere görünmüyor
+Uygulama tepsidedir. Tepsi simgesine tıklayın veya yeniden başlatmayı deneyin: ikinci kopya açılmaz, mevcut pencereyi öne getirir.
 
 ### Katalog ve listeler
 
-#### "Radyo veritabanına ulaşılamadı (...)" hatası
-Radyo kataloğuna (Radio Browser) bağlanılamadı. Sırasıyla kontrol edin:
-1. İnternet bağlantınız çalışıyor mu? (Bir web sitesi açmayı deneyin.)
-2. Güvenlik duvarı, antivirüs veya kurumsal proxy `*.api.radio-browser.info` adreslerini engelliyor mu?
-3. Birkaç dakika sonra ülke/tür listesini yeniden açın. Radyo kataloğu topluluk tarafından işletilir; geçici olarak yavaşlayabilir. Uygulama üç sunucuyu sırayla dener.
+#### "Radyo veritabanına ulaşılamadı (...)"
+Radio Browser'a bağlanılamadı. Sırasıyla kontrol edin: internet bağlantısı; güvenlik duvarı, antivirüs veya kurumsal proxy `*.api.radio-browser.info` adreslerini engelliyor mu; birkaç dakika sonra tekrar deneyin. Uygulama üç sunucuyu sırayla dener.
 
-#### Ülke listesi boş ya da "Liste alınamadı: ..." mesajı
-Yukarıdaki maddeyle aynı. Listenin altındaki mesajın son kısmındaki ayrıntı (`HTTP 503` gibi) sunucunun geçici olarak yanıt vermediğini gösterir; birkaç dakika sonra tekrar deneyin.
+#### Liste boş ya da "Liste alınamadı: ..." mesajı
+Yukarıdakiyle aynı. Mesajdaki `HTTP 503` gibi bir kod, sunucunun geçici olarak yanıt vermediğini gösterir.
 
-#### "Konumunuz: ..." yerine Popüler listesi açıldı
-Bu bir hata değil, bir geri dönüş davranışıdır. Olası nedenler:
-- IP konum servisleri ulaşılamadı → işletim sistemi bölge ayarı kullanılır; o da yoksa Popüler açılır.
-- Konumunuzdaki ülkede kayıtlı istasyon yok → Popüler açılır ve üstte "… için istasyon bulunamadı" yazar.
-- VPN kullanıyorsanız VPN'in çıkış ülkesi tespit edilir; istediğiniz ülkeyi **Ülkeler** listesinden seçebilirsiniz.
+#### "Bulunduğum ülke" yerine Popüler açıldı
+Bu bir hata değil, geri dönüş davranışıdır: konum servisine ulaşılamadıysa işletim sistemi bölge ayarı kullanılır; o da yoksa veya ülkede istasyon yoksa Popüler açılır.
 
 #### Konum yanlış ülkeyi gösteriyor
-IP tabanlı konum her zaman kesin değildir (VPN, mobil operatör, kurumsal çıkış noktası). **Ülkeler** sekmesinden doğru ülkeyi seçin. Uygulama yanlış konumu hatırlamaz; her açılışta yeniden arar.
+IP tabanlı konum kesin değildir (VPN, mobil operatör, kurumsal çıkış noktası). **Ülkeler** sekmesinden doğru ülkeyi seçin.
 
 #### Arama sonuç vermiyor
-- Daha kısa ya da farklı bir ad deneyin (örn. `radio` yerine `fm`).
-- Arama istasyon **adına** göre yapılır; tür veya ülke yazmak için **Türler** ya da **Ülkeler** sekmesini kullanın.
-- Çalışmayan (`hidebroken`) istasyonlar sonuçlarda gösterilmez; bu beklenen davranıştır.
+Daha kısa veya farklı bir ad deneyin. Arama istasyon **adına** göre yapılır; tür ya da ülke için ilgili sekmeleri kullanın. Çalışmayan istasyonlar sonuçlarda gösterilmez; bu beklenen davranıştır.
 
-#### Bir ülkedeki istasyonların bazıları çalmıyor
-Radio Browser kataloğundaki kayıtların bir kısmı zamanla çevrimdışı olur. Radyn çalışmayanları listelemeye çalışmaz, ancak kayıt yeni kapanmış olabilir. Başka bir istasyon deneyin; ya da istasyon kataloğu güncellenene kadar bekleyin.
+#### Bir istasyon çalmıyor
+Katalogdaki kayıtların bir kısmı zamanla çevrimdışı olur. Başka bir istasyon deneyin.
 
 ### Oynatma ve ses
 
 #### Ses hiç çıkmıyor
-Sırayla kontrol edin:
-1. **Sessize alma:** Ses simgesi kapalı-ses görünümündeyse `M` tuşuna basın ya da simgeye tıklayın.
-2. **Uygulama ses seviyesi:** Windows Ses Karıştırıcısı'nda (`Ses ayarları → Uygulama ses ayarları`) Radyn'in sesi kısık ya da kapalı olmasın.
+1. **Sessize alma:** Ses simgesi kapalı görünümdeyse `M` tuşuna basın.
+2. **Windows Ses Karıştırıcısı:** Radyn'in sesi kısık veya kapalı olmasın.
 3. **Çıkış aygıtı:** Doğru hoparlör/kulaklık seçili mi?
-4. **Yayın:** Başka bir istasyon deneyin. Bazı yayınlar bölgeye ya da saate göre kapalı olabilir.
-5. Linux'ta: masaüstü ses sunucunuzun (PipeWire/PulseAudio) çalıştığını doğrulayın.
+4. **Yayın:** Başka bir istasyon deneyin.
+5. **Linux:** PipeWire/PulseAudio'nun çalıştığını doğrulayın.
 
 #### İstasyon "Bağlantı kurulamadı" diyor
-Radyn üç kez yeniden bağlanmayı denedi ve yayın açılamadı. Nedenler:
-- Yayın sunucusu kapalı veya istasyon çevrimdışı → başka bir istasyon deneyin.
-- Güvenlik duvarı yayın portunu engelliyor (genelde 80, 443, 8000, 8080 gibi portlar).
-- Yayın sunucusu IP/bölge kısıtlaması uyguluyor → VPN'i kapatıp deneyin ya da farklı bir istasyon seçin.
-- Yayın `m3u8` (HLS) formatında ve tarayıcı motoru yayına erişemiyor → bağlantı ağınızı kontrol edin.
+Üç yeniden deneme de başarısız oldu. Nedenler: yayın kapalı veya çevrimdışı; güvenlik duvarı yayın portunu engelliyor; yayın bölgesel kısıtlama uyguluyor (VPN'i kapatıp deneyin); yayın formatı desteklenmiyor.
 
-#### Yayın sık sık kesiliyor, "Tamponlanıyor…" çok görünüyor
-- Wi-Fi yerine kablolu bağlantı deneyin.
-- Başka ağır indirme/yayın uygulamalarını kapatın.
-- 320 kbps gibi yüksek bitrate'li yayınlar daha fazla veri ister; 128 kbps bir istasyonu deneyin.
+#### Yayın sık kesiliyor, "Tamponlanıyor…" çok görünüyor
+Kablolu bağlantı deneyin, ağır indirmeleri durdurun, düşük bitrate'li bir istasyon seçin.
 
-#### Yayın gecikmeli ya da "CANLI" yazmasına rağmen eski içerik çalıyor
-Canlı radyo yayınları genellikle birkaç saniye geriden gelir; bu normaldir. Radyn duraklatma sonrasında yayını yeniden bağlar (canlı yayın duraklatılamaz, durdurulup yeniden başlatılır).
-
-#### Oynat düğmesine basınca bir şey olmuyor
-- Önce durum satırına bakın: `Bağlanıyor…` görünüyorsa biraz bekleyin.
-- Başka bir istasyon seçmeyi deneyin.
-- Uygulamayı yeniden başlatın.
+#### Yayın gecikmeli
+Canlı radyo yayınları genellikle birkaç saniye geriden gelir; bu normaldir. Duraklatma yoktur; durdurup yeniden başlatırsınız.
 
 ### Şarkı bilgisi ve albüm kapağı
 
 #### Şarkı adı hiç görünmüyor
-Şarkı bilgisi yalnızca yayın **ICY metadatası** gönderiyorsa görünür. Çoğu Shoutcast/Icecast MP3/AAC yayını bunu gönderir, ancak bazıları göndermez. Ayrıca HLS (`m3u8`) yayınlarında bu özellik desteklenmez. Yayın kendi sitesinde şarkı bilgisi gösteriyor olsa bile uygulama onu okuyamıyorsa bu bir sınırlamadır.
+Şarkı bilgisi yayının metadata göndermesine bağlıdır: çoğu Shoutcast/Icecast MP3/AAC yayını gönderir; HLS yayınları ise yalnızca ID3 etiketi taşıyorsa gösterir. Yayın metadata göndermiyorsa Radyn okuyamaz.
 
-#### Şarkı adı yanlış ya da reklam metni görünüyor
-Bazı yayınlar şarkı yerine istasyon adını, reklamı veya saat bilgisini gönderir. Bu yayın kaynağından gelir; Radyn değiştiremez.
+#### Şarkı adı yanlış ya da reklam metni
+Yayın kaynağı bunu gönderiyordur; Radyn değiştiremez.
 
-#### Albüm kapağı görünmüyor, logo görünüyor
-iTunes kataloğunda sanatçı ve parça adı eşleşmedi. Bu bilinçli bir tercihtir: yanlış kapak göstermemek için sadece eşleşen sonuçlar kullanılır. Yayın şarkı adını tam ve standart biçimde (`Sanatçı - Şarkı`) vermiyorsa eşleşme olmayabilir.
+#### Albüm kapağı görünmüyor
+iTunes kataloğunda sanatçı ve parça adı eşleşmedi. Yanlış kapak göstermemek için yalnızca eşleşen sonuçlar kullanılır. Yayın şarkı adını `Sanatçı - Şarkı` biçiminde vermiyorsa eşleşme olmayabilir.
 
-#### Kapak çok geç geliyor
-Kapak, şarkı bilgisi geldikten sonra arka planda aranır (en fazla 8 sn). Sonuç önbelleğe alınır; aynı şarkı tekrar çalınırsa anında gelir.
+### Görev çubuğu ve tepsi
 
-### Görev çubuğu, tepsi ve medya tuşları
+#### Küçük resim düğmeleri (Önceki/Oynat/Sonraki) görünmüyor
+Düğmeler, görev çubuğundaki simgenin üzerine gelindiğinde açılan önizlemenin altındadır. Pencere tepsiye gizlenmişse görev çubuğunda simge yoktur; tepsiden **Pencereyi göster** deyin.
 
-#### Windows görev çubuğunda düğmeler (Önceki/Oynat/Sonraki) görünmüyor
-- Düğmeler pencere küçük resminde görünür: görev çubuğundaki Radyn simgesinin üzerine gelin. Pencere tepsiye gizlenmişse görev çubuğunda simge yoktur; tepsiden **Pencereyi göster** deyin.
-- Windows'un yeni sürümlerinde küçük resim düğmeleri, önizlemenin altında gösterilir; önizleme kapalıysa görünmez.
+#### Jump list görevleri yok
+Görev çubuğu simgesine sağ tıklayın. Görevler en az bir kez uygulama açıldığında kaydedilir. Dil değiştirdiyseniz görev adları bir sonraki açılışta güncellenir.
 
 #### Tepsi simgesi görünmüyor (Linux)
-- GNOME'da tepsi simgeleri varsayılan olarak yoktur. **AppIndicator and KStatusNotifierItem Support** (ya da benzeri) eklentisini kurun ve etkinleştirin.
-- KDE ve XFCE'de genelde sorunsuz çalışır.
-- Tepsi olmasa bile uygulamayı yeniden başlatmak (ikinci kopya açmak) pencereyi öne getirir.
+GNOME'da **AppIndicator and KStatusNotifierItem Support** eklentisi gerekir. KDE ve XFCE'de genelde sorunsuz çalışır.
 
 #### Medya tuşları çalışmıyor
-- Medya tuşları genel kısayol olarak kaydedilir. Spotify, Groove, VLC gibi başka bir uygulama aynı tuşları önce aldıysa Radyn tepkisiz kalır. O uygulamayı kapatın ya da tuşu ona bırakın.
-- Bazı dizüstü bilgisayarlarda medya tuşları işletim sistemi kısayolu olarak çalışır; bu durumda `Fn` tuşuyla birlikte basmanız gerekebilir.
-- Uygulama tepsideyken de çalışır; pencere kapalı olması sorun değildir.
+Spotify, Groove, VLC gibi bir uygulama aynı tuşları önce aldıysa Radyn tepkisiz kalır. O uygulamayı kapatın. Bazı dizüstü bilgisayarlarda `Fn` tuşuyla birlikte basmanız gerekebilir.
 
 #### Linux medya panelinde Radyn görünmüyor
-MPRIS, `mpris-service` paketi kurulu ve DBus oturumu çalışıyorsa etkindir. Kaynak koddan çalıştırıyorsanız `npm install` komutunun `mpris-service` paketini kurduğundan emin olun (isteğe bağlı bağımlılık olduğu için hata vermeden atlanabilir). Konsolda `MPRIS başlatılamadı` mesajı varsa DBus oturumunu kontrol edin.
+MPRIS, `mpris-service` paketi kurulu ve DBus oturumu çalışıyorsa etkindir. Konsolda `MPRIS başlatılamadı` mesajı varsa DBus oturumunu kontrol edin.
 
-### Pencere ve kapatma davranışı
+### Pencere ve kapatma
 
 #### Pencereyi kapattım ama uygulama açık kaldı
-Bu tasarımdır: X düğmesi uygulamayı tepsiye küçültür, yayın kesilmez. Tamamen kapatmak için tepsi simgesine sağ tıklayıp **Çıkış** seçin. Linux'ta tepsi simgesi görünmüyorsa uygulamayı `pkill -f radyn` ile sonlandırabilirsiniz.
+Bu tasarımdır: X düğmesi uygulamayı tepsiye küçültür, yayın kesilmez. Tamamen kapatmak için tepsi menüsünden **Çıkış** seçin.
 
-#### Uygulama kapanmıyor / Görev yöneticisinde kalıyor
-Tepsi menüsünden **Çıkış** deneyin. Çalışmıyorsa görev yöneticisinde `Radyn` süreçlerini sonlandırın. Veriler kaybolmaz; favoriler ve ses ayarı her kapanışta kaydedilir.
+#### Uygulama kapanmıyor
+Tepsi menüsünden **Çıkış** deneyin. Çalışmazsa görev yöneticisinde `Radyn` süreçlerini sonlandırın. Favoriler ve ses ayarı her kapanışta kaydedildiği için kaybolmaz.
 
-### Favoriler ve veriler
+### Dil ve veriler
+
+#### Dil yanlış ya da değişmiyor
+Kenar çubuğunun altındaki dil seçicisini kullanın. Seçim `veri.json` içinde saklanır; sıfırlamak için `settings.lang` alanını silin.
 
 #### Favorilerim kayboldu
-- `%APPDATA%\Radyn\veri.json` (Windows) ya da `~/.config/Radyn/veri.json` (Linux) dosyasının varlığını kontrol edin.
-- Dosya bozulmuşsa uygulama boş verilerle açılır. Dosyayı silmeden önce yedeğini alın.
-- Farklı bir bilgisayardan kopyalıyorsanız dosyayı doğru klasöre koyduğunuzdan emin olun; kullanıcı adı değişmiş olabilir.
+`veri.json` dosyasının yerini kontrol edin ([Verileriniz](#verileriniz-ve-dosya-konumları)). Dosya bozulmuşsa uygulama boş verilerle açılır; silmeden önce yedek alın. Farklı bir bilgisayardan kopyaladıysanız dosyayı doğru klasöre koyduğunuzdan emin olun.
 
-#### Ses seviyem her açılışta değişiyor
-Ses seviyesi `veri.json` içindeki `settings.volume` alanında saklanır ve her değişiklikte kaydedilir (300 ms gecikmeyle). Dosya yazılamıyorsa (salt okunur klasör, dolu disk) kayıt yapılamaz; konsolda `Veriler kaydedilemedi` mesajına bakın.
-
-### Diğer
-
-#### Yüksek internet/veri kullanımı
-Her çalan istasyon için Radyn şarkı bilgisini okumak üzere ikinci bir bağlantı açar. Bu, yayın verisini kabaca iki katına çıkarabilir. Mobil veri kullanıyorsanız dikkat edin.
-
-#### Radyn yazı tiplerini tanımıyor / arayüz garip görünüyor
-Arayüz Windows'ta **Segoe UI Variable**, Linux'ta sistem yazı tipini kullanır. Yazı tipi yoksa tarayıcı motoru yedek yazı tipine geçer; bu normaldir.
+#### Veri kullanımı yüksek
+Yayın, istasyonun bitrate'i kadar veri kullanır; ikinci bir bağlantı açılmaz. 320 kbps gibi yüksek bitrate'li yayınlar daha fazla veri harcar; mobil veride dikkatli olun.
 
 ---
 
 ## Hata raporu nasıl hazırlanır
 
-Bir sorun çözülmediyse şu bilgileri toplayın (bunlar kişisel veri içermez; istasyon adlarını paylaşmak isteğe bağlıdır):
+Bir sorun çözülmediyse şu bilgileri toplayın:
 
-1. **Sürüm ve sistem:** Windows sürümü (ör. 10 22H2, 11 23H2) ya da Linux dağıtımı ve sürümü (`lsb_release -a`), CPU mimarisi.
-2. **Radyn sürümü:** Ayarlar → Uygulamalar listesinde ya da kurulum klasöründeki `package.json`'daki `version`.
-3. **Kaynak:** Kurulum dosyası (`Radyn.Setup.1.0.0.exe`), paketli klasör veya `npm start`.
-4. **Adımlar:** Hatayı tetikleyen işlemler (ör. "Türkiye kategorisine tıkladım, 500 istasyon geldi, bir istasyonu çalınca 'Bağlantı kurulamadı' çıktı").
-5. **Ekran mesajı:** Durum satırındaki ya da listedeki kırmızı/gri hata metni (tam olarak).
-6. **Terminal çıktısı:** `npm start` ile başlatılmış bir oturumda hata satırları (`Error`, `ERR`, `MPRIS`, `Veriler kaydedilemedi` gibi).
-7. **İstasyon bilgisi (varsa):** Sorunlu istasyonun adı ve ülkesi. Yayın adresini (URL) paylaşmak isteğe bağlıdır.
+1. **Sistem:** Windows sürümü (ör. 10 22H2, 11 23H2) veya Linux dağıtımı ve sürümü (`lsb_release -a`), CPU mimarisi.
+2. **Radyn sürümü:** Ayarlar → Uygulamalar listesi ya da `package.json` içindeki `version`.
+3. **Kaynak:** Kurulum dosyası, AppImage, .deb veya `npm start`.
+4. **Adımlar:** Hatayı tetikleyen işlemler (ör. "Türkiye kategorisine tıkladım, bir istasyonu çalınca 'Bağlantı kurulamadı' çıktı").
+5. **Ekran mesajı:** Durum satırındaki veya listedeki hata metni (tam olarak).
+6. **Terminal çıktısı:** `npm start` ile başlatılmış oturumdan hata satırları (`Error`, `[taskbar]`, `MPRIS`, `Veriler kaydedilemedi` gibi).
+7. **İstasyon (varsa):** Sorunlu istasyonun adı ve ülkesi. Yayın adresi isteğe bağlıdır.
 
-Hata raporlarında `veri.json` dosyanızın tamamını paylaşmayın; favorileriniz ve son dinlemeleriniz içinde olabilir.
+Hata raporunda `veri.json` dosyanızın tamamını paylaşmayın; favoriler ve son dinlemeleriniz içinde olabilir.
 
 ---
 
@@ -515,94 +476,108 @@ Hata raporlarında `veri.json` dosyanızın tamamını paylaşmayın; favorileri
 |---|---|
 | `npm install` | Bağımlılıkları ve Electron'u kurar |
 | `npm start` | Uygulamayı geliştirme modunda açar |
-| `npm test` | `node:test` ile 28 testi çalıştırır |
-| `npm run icons` | `scripts/make-icons.js` ile görev çubuğu düğmelerini ve tepsi ikonunu üretir |
-| `npm run dist:win` | Windows NSIS kurulum dosyasını `dist/` içine üretir |
-| `npm run dist:linux` | AppImage ve .deb üretir (**Linux'ta çalıştırın**) |
-| `npx electron-builder --linux dir` | Linux paketli klasörünü üretir (`dist/linux-unpacked`) |
+| `npm test` | `node:test` ile 37 testi çalıştırır |
+| `npm run icons` | Görev çubuğu düğmelerini ve tepsi ikonunu üretir |
+| `npm run dist:win` | Windows kurulum dosyasını `dist/` içine üretir |
+| `npm run dist:linux` | AppImage ve .deb üretir (Linux'ta çalıştırın) |
+| `npx electron-builder --linux dir` | Linux paketli klasörünü üretir |
 
 ### Proje yapısı
 
 ```
 radio/
-├── main.js              Ana süreç: pencere, tepsi, görev çubuğu düğmeleri, medya tuşları, IPC
-├── preload.js           Arayüze açılan sınırlı köprü (window.radio)
+├── main.js                 Ana süreç: pencere, tepsi, görev çubuğu, jump list, medya tuşları, IPC
+├── preload.js              Arayüze açılan sınırlı köprü (window.radio)
+├── install-radyn.sh        Linux kullanıcı kurulum betiği (sürümden indirir, doğrular)
 ├── src/
-│   ├── radio-api.js     Radio Browser istemcisi (sunucu yedeklemeli, User-Agent gönderir)
-│   ├── icy.js           ICY şarkı bilgisi okuyucusu (yeniden bağlanma dahil)
-│   ├── art.js           Albüm kapağı arayıcı (iTunes Search, eşleşme kontrolü, önbellek)
-│   ├── geo.js           IP tabanlı ülke tespiti (yedek: işletim sistemi bölgesi)
-│   ├── store.js         Favoriler, son dinlenenler, ayarlar (JSON, atomik yazma)
-│   └── mpris.js         Linux MPRIS entegrasyonu (isteğe bağlı)
+│   ├── radio-api.js        Radio Browser istemcisi (sunucu yedeklemeli)
+│   ├── stream-proxy.js     Yerel ses aktarıcı: tek bağlantı, metadata ayırma, tek kullanımlık oturum
+│   ├── icy.js              ICY metadata ayrıştırıcı (ses ve şarkı adını ayırır)
+│   ├── id3.js              HLS için ID3 etiket okuyucu (renderer ve Node'da çalışır)
+│   ├── strings.js          Beş dilin çeviri sözlüğü (renderer ve Node'da çalışır)
+│   ├── art.js              Albüm kapağı arayıcı (iTunes Search, eşleşme kontrolü, önbellek)
+│   ├── geo.js              IP tabanlı ülke tespiti (yedek: işletim sistemi bölgesi)
+│   ├── store.js            Favoriler, son dinlenenler, ayarlar (JSON, atomik yazma)
+│   └── mpris.js            Linux MPRIS entegrasyonu (isteğe bağlı)
 ├── renderer/
-│   ├── index.html       Arayüz iskeleti ve SVG simge seti
-│   ├── styles.css       Tema belirteçleri (açık/koyu), düzen
-│   ├── app.js           Arayüz mantığı: gezinme, oynatma kuyruğu, favoriler, sessize alma
-│   └── logo-mark.png    Kenar çubuğu logosu
-├── assets/              Uygulama ikonu, tepsi ikonu, görev çubuğu düğmeleri
-├── packaging/
-│   └── radyn.desktop    Linux masaüstü giriş dosyası şablonu
+│   ├── index.html          Arayüz iskeleti (çeviri anahtarlı öğeler)
+│   ├── app.js              Arayüz mantığı: gezinme, oynatma, favoriler, dil, sessize alma
+│   ├── styles.css          Tema belirteçleri (açık/koyu), düzen
+│   └── logo-mark.png       Kenar çubuğu logosu
+├── assets/                 Uygulama ikonu, tepsi ikonu, görev çubuğu düğmeleri
+├── packaging/radyn.desktop Linux masaüstü giriş dosyası şablonu
 ├── scripts/
-│   ├── make-icons.js    Simge üretici (bağımlılıksız PNG kodlayıcı)
-│   └── install-linux.sh Linux kullanıcı kurulum betiği
-└── test/                node:test testleri (API, ICY, kapak, depo, konum)
+│   ├── make-icons.js       Simge üretici (bağımlılıksız PNG kodlayıcı)
+│   └── install-linux.sh    Yerel derlemeden kurulum (geliştiriciler için)
+├── .github/workflows/
+│   └── release.yml         Etiketle tetiklenen derleme, duman testi, imzalama ve yayın
+└── test/                   node:test testleri
 ```
 
 ### Mimari özeti
 
-- **Renderer** hiçbir Node/Electron nesnesine doğrudan erişmez; yalnızca `preload.js` ile açılan `window.radio` köprüsünü kullanır. `contextIsolation` ve `sandbox` açıktır.
-- **Dış HTTP istekleri** (radyo kataloğu, IP tespiti, iTunes) ana süreçte yapılır; bu sayede tarayıcı CORS kısıtlamalarına takılmaz ve User-Agent kontrol altında kalır.
-- **Şarkı bilgisi** ayrı bir ICY bağlantısıyla okunur; oynatma ise renderer'daki `<audio>` (veya HLS için hls.js) ile yapılır.
-- **Durum senkronizasyonu:** Renderer, oynatma durumunu `state` mesajıyla ana sürece bildirir; ana süreç pencere başlığını, tepsi ipucunu, görev çubuğu düğmelerini ve MPRIS'i bu tek kaynaktan günceller.
-- **Güvenlik:** Pencere dışına gezinme engellenir, yeni pencereler açılmaz, bağlantılar varsayılan tarayıcıda açılır. Arayüz verileri `textContent` ile yazılır (istasyon adlarında HTML enjeksiyonu yoktur). CSP meta etiketi aktiftir.
+- **Renderer** Node/Electron nesnelerine erişmez; yalnızca `preload.js` ile açılan `window.radio` köprüsünü kullanır. `contextIsolation` ve `sandbox` açıktır.
+- **Yayın akışı:** Düz akışlar ana süreçteki yerel aktarıcıdan (`127.0.0.1`, tek kullanımlık adres) geçer. Aktarıcı yayını tek bağlantıda okur, ICY metadatasını ayırıp şarkı adını ana sürece verir, ses verisini değişmeden iletir. HLS yayınları hls.js ile çalar ve ID3 etiketini renderer'da okuyup iletir.
+- **Durum senkronizasyonu:** Renderer oynatma durumunu ana sürece bildirir; ana süreç pencere başlığını, tepsi ipucunu, görev çubuğu düğmelerini, jump list'i ve MPRIS'i bu tek kaynaktan günceller.
+- **Güvenlik:** Pencere dışına gezinme engellenir, yeni pencere açılmaz, bağlantılar tarayıcıda açılır. Arayüz verileri `textContent` ile yazılır. CSP meta etiketi aktiftir.
 
 ### Testler
 
-```
-npm test
-```
-
 | Dosya | Kapsam |
 |---|---|
-| `test/radio-api.test.js` | İstasyon normalizasyonu, sunucu yedeklemesi, ülke adları (Intl), geçersiz girdi reddi |
-| `test/icy.test.js` | ICY ayrıştırma, parça parça veri, **yerel HTTP sunucusuyla uçtan uca** şarkı bilgisi, ICY desteklemeyen akış |
-| `test/art-store.test.js` | Kapak eşleşmesi, önbellek, hata durumunda önbelleğe almama, favori/son dinlenen/bozuk dosya |
-| `test/geo.test.js` | Ülke kodu doğrulama, servis yedeklemesi, işletim sistemi bölgesine düşme |
+| `radio-api.test.js` | İstasyon normalizasyonu, sunucu yedeklemesi, ülke adları, geçersiz girdi |
+| `icy.test.js` | ICY ayrıştırma, parça parça veri, yerel HTTP sunucusuyla uçtan uca şarkı bilgisi |
+| `id3-proxy.test.js` | ID3 çerçeveleri (UTF-8, UTF-16, v2.4); yerel aktarıcı: metadata ayrımı, tek kullanımlık oturum, 502 hatası |
+| `art-store.test.js` | Kapak eşleşmesi, önbellek, favori/son dinlenen/bozuk dosya |
+| `geo.test.js` | Ülke kodu doğrulama, servis yedeklemesi, bölge ayarına düşme |
+| `strings.test.js` | Beş dilde aynı anahtarlar, dil çözümleme, değişken doldurma |
 
-### Windows paketi
+### Sürüm yayını ve CI
 
-`npm run dist:win` şu çıktıları üretir:
+`.github/workflows/release.yml` bir `v*` etiketi gönderildiğinde şunları yapar:
 
-- `dist/Radyn Setup 1.0.0.exe` — kurulum dosyası (NSIS, kullanıcı kurulumu)
-- `dist/win-unpacked/Radyn.exe` — kurulum gerektirmeyen paketli sürüm
+1. Birim testlerini çalıştırır.
+2. **Linux:** `dir`, `AppImage` ve `deb` paketlerini derler; sanal ekranda (xvfb) uygulamayı 30 saniye çalıştırıp duman testi yapar; sandbox hatası veya erken kapanma varsa işi başarısız sayar.
+3. **Windows:** NSIS kurulum dosyasını derler (imza anahtarları tanımlıysa imzalar).
+4. Her platform için SHA-256 özetleri üretilir ve `SHA256SUMS.txt` olarak birleştirilir.
+5. Sürüm oluşturulur veya güncellenir ve dosyalar yüklenir.
 
-Kurulum dosyası **imzalanmamıştır**. Yayın için kod imzalama sertifikası eklenirse `package.json` içindeki `build.win` bölümüne `certificateFile` ve `certificatePassword` ortam değişkenleriyle ayar eklenebilir.
+Yeni sürüm çıkarmak için:
 
-### Linux paketi
+```powershell
+# package.json içindeki "version" alanını ve RELEASE_NOTES.md'yi güncelleyin, sonra:
+git tag -a v1.2.0 -m "Radyn 1.2.0"
+git push origin v1.2.0
+```
 
-- `npx electron-builder --linux dir` Windows'ta da çalışır; ancak `dist/linux-unpacked/radyn` dosyasında çalıştırma izni NTFS üzerinde korunmaz. Bu yüzden kurulum betiği izinleri kopyalamadan sonra yeniden verir.
-- AppImage ve .deb üretimi için **Linux** gerekir (`mksquashfs` ve sembolik bağlantı desteği).
+### Kod imzalama (SmartScreen)
+
+Windows'un "Windows PC'nizi korudu" uyarısı yalnızca **güvenilir bir sertifika ile imzalanmış** kurulum dosyalarında kalkar. İki yol vardır:
+
+1. **Kod imzalama sertifikası (OV/EV):** Bir sertifika otoritesinden alınır (ücretlidir). Sertifika `.pfx` olarak dışa aktarılır ve GitHub deposuna iki gizli anahtar eklenir:
+   - `WIN_CSC_LINK`: `.pfx` dosyasının base64 kodlu hali (`[Convert]::ToBase64String([IO.File]::ReadAllBytes("sertifika.pfx"))`)
+   - `WIN_CSC_KEY_PASSWORD`: sertifika parolası
+
+   Bu anahtarlar tanımlandığında sonraki sürüm otomatik olarak imzalanır.
+2. **Azure Trusted Signing veya SignPath gibi bulut imzalama hizmetleri:** Ayrı yapılandırma gerektirir; `release.yml` içindeki Windows adımı buna göre genişletilebilir.
+
+Sertifika olmadan imzalı sürüm üretilemez. Ayrıca SmartScreen itibarı birikir: imzalı olsa bile çok az indirilen yeni bir sürümde uyarı kısa süre görünebilir.
 
 ---
 
 ## Bilinen sınırlamalar
 
-- **Şarkı bilgisi** ICY metadatası gönderen yayınlarla sınırlıdır; HLS yayınlarında gösterilmez.
-- **Albüm kapağı** iTunes kataloğuna bağlıdır; her şarkı bulunamaz ve kapak yalnızca eşleşen sonuçlarda gösterilir.
+- **Şarkı bilgisi** yayının metadata göndermesine bağlıdır. HLS yayınları yalnızca ID3 etiketi taşıyorsa gösterilir.
+- **Albüm kapağı** iTunes kataloğuna bağlıdır; her şarkı bulunamaz.
 - **Katalog** topluluk tarafından işletilir; bazı istasyonlar çevrimdışı ya da hatalı meta bilgili olabilir.
 - **Canlı yayın duraklatılamaz**; durdurulup yeniden başlatılır.
-- **Görev çubuğu düğmeleri** yalnızca Windows'ta, **tepsi** ise bazı Linux masaüstlerinde (GNOME'da eklenti gerekir) kullanılabilir.
-- **Linux** kurulumu ve paketleri bu sürümde yalnızca dolaylı olarak doğrulanmıştır (paketlenmiş klasör üretildi; uygulamanın Linux'ta çalıştığı henüz test edilmedi).
-- **Kurulum dosyası imzasızdır**; Windows SmartScreen uyarısı görünür.
-- **Ses kaydı, ekran görüntüsü veya yayın kaydı** özelliği yoktur.
-- **Çoklu dil:** Arayüz yalnızca Türkçedir.
+- **Tepsi simgesi** GNOME'da bir eklenti gerektirir.
+- **Windows kurulum dosyası**, kod imzalama sertifikası tanımlanmadan imzalı olmaz; SmartScreen uyarısı çıkar.
+- **Linux** sürümünün AppImage/deb paketi ve kurulum betiği, sürüm yayını sırasında CI'da derlenip duman testinden geçer; gerçek bir Linux masaüstünde ek doğrulama önerilir.
+- **Görev çubuğu küçük resim düğmeleri ve jump list** Windows API'siyle eklenir ve sistem tarafından kabul edildiği doğrulanır; görsel doğrulama ortama bağlı olarak yapılamayabilir.
 
 ---
 
-## Sürüm notları
-
-Ayrıntılar ve indirme bağlantısı için [RELEASE_NOTES.md](RELEASE_NOTES.md) dosyasına ve [Sürümler sayfasına](https://github.com/Kurenai10/radyn/releases) bakın.
-
 ## Lisans
 
-Bu proje henüz bir lisansla yayımlanmamıştır (`package.json` içinde `"private": true`). Kullanım ve dağıtım koşulları için proje sahibine danışın.
+Bu proje henüz bir lisansla yayımlanmamıştır. Kullanım ve dağıtım koşulları için proje sahibine danışın.

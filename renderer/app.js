@@ -1,6 +1,8 @@
 'use strict';
 
 (() => {
+  const I18N = window.RadynI18n;
+  const ID3 = window.RadynId3;
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const HLS_RE = /\.m3u8?(\?|$)/i;
   const ACTIVE = new Set(['loading', 'buffering', 'playing']);
@@ -8,31 +10,39 @@
   const audio = document.getElementById('audio');
 
   const state = {
-    view: 'top',
-    list: [],            // ekranda görünen istasyonlar
-    queue: [],           // çalan listenin kopyası (önceki/sonraki için)
+    lang: 'en',
+    regionNames: null,
+    view: 'home',
+    header: { title: null, sub: null },  // işlevler: dil değişince yeniden çevrilir
+    gridMessage: null,                   // { key, vars }
+    list: [],
+    queue: [],
     queueIndex: -1,
-    current: null,       // çalan istasyon
-    status: 'stopped',   // stopped | loading | buffering | playing | error
-    np: { artist: '', title: '', artUrl: '' }, // ICY'den gelen şu an çalan parça
+    current: null,
+    status: 'stopped',                   // stopped | loading | buffering | playing | error
+    np: { artist: '', title: '', artUrl: '' },
     favorites: [],
     favIds: new Set(),
     recent: [],
     browseMode: 'countries',
+    browseData: { countries: null, tags: null },
     browseItems: [],
     browseKey: null,
-    countries: null,
-    tags: null,
     hls: null,
     volume: 0.8,
     muted: false,
     startedAt: 0,
     requestId: 0,
+    session: 0,                          // her yeni yayın denemesi artar
     retries: 0,
     retryTimer: null,
     tick: null,
     artKey: '',
   };
+
+  const t = (key, vars) => I18N.translate(state.lang, key, vars);
+  const $ = (id) => document.getElementById(id);
+  const clamp01 = (n) => Math.min(1, Math.max(0, Number(n) || 0));
 
   // ------------------------------------------------------------ yardımcılar
 
@@ -62,10 +72,6 @@
     return svg;
   }
 
-  const $ = (id) => document.getElementById(id);
-  const clamp01 = (n) => Math.min(1, Math.max(0, Number(n) || 0));
-  const capitalize = (s) => s.charAt(0).toLocaleUpperCase('tr') + s.slice(1);
-
   function errorText(err) {
     return String(err && err.message ? err.message : err)
       .replace(/^Error invoking remote method '[^']+': (Error: )?/, '');
@@ -87,27 +93,28 @@
     return h ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
   }
 
-  const regionNames = (() => {
+  const capitalize = (s) => s.charAt(0).toLocaleUpperCase(state.lang) + s.slice(1);
+
+  function makeRegionNames(lang) {
     try {
-      return new Intl.DisplayNames(['tr'], { type: 'region' });
+      return new Intl.DisplayNames([lang], { type: 'region' });
     } catch {
       return null;
     }
-  })();
+  }
 
-  /** Ülke kodunun Türkçe adı; bilinmiyorsa null. */
+  /** Ülke kodunun seçili dildeki adı; bilinmiyorsa null. */
   function regionName(code) {
     const upper = String(code || '').toUpperCase();
-    if (!regionNames || !/^[A-Z]{2}$/.test(upper)) return null;
+    if (!state.regionNames || !/^[A-Z]{2}$/.test(upper)) return null;
     try {
-      const name = regionNames.of(upper);
+      const name = state.regionNames.of(upper);
       return name && name !== upper ? name : null;
     } catch {
       return null;
     }
   }
 
-  /** Ülke adını Türkçe göster (kodu varsa), yoksa kaynaktaki adı. */
   function countryLabel(s) {
     return regionName(s.countryCode) || s.country || '';
   }
@@ -134,22 +141,65 @@
     return wrap;
   }
 
-  // ------------------------------------------------------------ başlık ve durum
+  // ------------------------------------------------------------ dil ve metinler
 
-  function setHeader(title, sub = '') {
-    $('viewTitle').textContent = title;
-    $('viewSub').textContent = sub;
+  /** data-i18n öznitelikli tüm sabit metinleri seçili dile çevirir. */
+  function applyStatic() {
+    document.documentElement.lang = state.lang;
+    document.querySelectorAll('[data-i18n]').forEach((node) => {
+      node.textContent = t(node.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach((node) => {
+      node.placeholder = t(node.dataset.i18nPlaceholder);
+    });
+    document.querySelectorAll('[data-i18n-aria-label]').forEach((node) => {
+      node.setAttribute('aria-label', t(node.dataset.i18nAriaLabel));
+    });
+    $('langSelect').value = state.lang;
+    applyMute(state.muted);
   }
 
-  function setGridMessage(text) {
-    $('stationGrid').replaceChildren();
+  function setLang(lang) {
+    if (!I18N.SUPPORTED_LANGS.includes(lang) || lang === state.lang) return;
+    state.lang = lang;
+    state.regionNames = makeRegionNames(lang);
+    window.radio.setLang(lang);
+    applyStatic();
+    renderHeader();
+    buildBrowseItems();
+    filterBrowse();
+    renderGrid();
+    renderPlayer();
+    renderStatusLine();
+    reportState();
+  }
+
+  // ------------------------------------------------------------ başlık ve liste
+
+  function setHeader(titleFn, subFn) {
+    state.header = { title: titleFn, sub: subFn };
+    renderHeader();
+  }
+
+  function renderHeader() {
+    const { title, sub } = state.header;
+    $('viewTitle').textContent = title ? title() : '';
+    $('viewSub').textContent = sub ? (sub() || '') : '';
+  }
+
+  function setGridMessage(key, vars) {
+    state.gridMessage = key ? { key, vars } : null;
+    renderGridMessage();
+  }
+
+  function renderGridMessage() {
     const box = $('emptyState');
-    box.textContent = text;
+    if (!state.gridMessage) {
+      box.classList.add('hidden');
+      return;
+    }
+    box.textContent = t(state.gridMessage.key, state.gridMessage.vars);
     box.classList.remove('hidden');
-  }
-
-  function clearGridMessage() {
-    $('emptyState').classList.add('hidden');
   }
 
   function setActiveNav(view) {
@@ -171,27 +221,26 @@
     clearBrowseActive();
     const reqId = ++state.requestId;
 
+    if (view === 'home') return showHome();
+
     if (view === 'favorites') {
       state.list = state.favorites;
-      setHeader('Favoriler', `${state.favorites.length} istasyon`);
+      setHeader(() => t('favorites_title'), () => t('count_stations', { n: state.favorites.length }));
       renderGrid();
-      return;
+      return undefined;
     }
 
     if (view === 'recent') {
       const data = await window.radio.getStore();
-      if (reqId !== state.requestId) return;
+      if (reqId !== state.requestId) return undefined;
       state.recent = data.recent;
       state.list = state.recent;
-      setHeader('Son dinlenenler', `${state.recent.length} istasyon`);
+      setHeader(() => t('recent_title'), () => t('count_stations', { n: state.recent.length }));
       renderGrid();
-      return;
+      return undefined;
     }
 
-    if (view === 'home') return showHome();
-
-    await loadStations({ type: 'top' }, 'Popüler', 'Dünya genelinde en çok oy alanlar', reqId);
-    return undefined;
+    return loadStations({ type: 'top' }, () => t('top_title'), () => t('top_sub'), reqId);
   }
 
   /** Uygulamanın açıldığı ülkenin istasyonları; ülkede istasyon yoksa Popüler'e düşer. */
@@ -200,8 +249,8 @@
     state.view = 'home';
     setActiveNav('home');
     clearBrowseActive();
-    setHeader('Bulunduğum ülke', 'Konum tespit ediliyor…');
-    setGridMessage('Yükleniyor…');
+    setHeader(() => t('home_title'), () => t('home_detecting'));
+    setGridMessage('loading');
 
     let code = null;
     try {
@@ -214,32 +263,46 @@
     if (!code) {
       state.view = 'top';
       setActiveNav('top');
-      await loadStations({ type: 'top' }, 'Popüler', 'konumunuz tespit edilemedi', reqId);
+      await loadStations({ type: 'top' }, () => t('top_title'), () => t('home_fallback_sub'), reqId);
       return;
     }
 
-    const name = regionName(code) || code;
-    const count = await loadStations({ type: 'country', value: code }, `Konumunuz: ${name}`, '', reqId);
+    const count = await loadStations(
+      { type: 'country', value: code },
+      () => t('home_label', { name: regionName(code) || code }),
+      null,
+      reqId,
+    );
     if (reqId !== state.requestId || count > 0) return;
-    await loadStations({ type: 'top' }, 'Popüler', `${name} için istasyon bulunamadı`, reqId);
+    await loadStations(
+      { type: 'top' },
+      () => t('top_title'),
+      () => t('home_empty_sub', { name: regionName(code) || code }),
+      reqId,
+    );
   }
 
-  /** Liste yükler ve istasyon sayısını döndürür (hata veya eski istekte -1). */
-  async function loadStations(query, title, sub, reqId = ++state.requestId) {
-    setHeader(title, 'Yükleniyor…');
-    setGridMessage('Yükleniyor…');
+  /** İstasyon listesi yükler; istasyon sayısını döndürür (hata veya eski istekte -1). */
+  async function loadStations(query, titleFn, subFn, reqId = ++state.requestId) {
+    setHeader(titleFn, () => t('loading'));
+    setGridMessage('loading');
     try {
       const list = await window.radio.stations(query);
       if (reqId !== state.requestId) return -1;
       state.list = list;
-      setHeader(title, `${list.length} istasyon${sub ? ` · ${sub}` : ''}`);
+      const n = list.length;
+      setHeader(titleFn, () => {
+        const count = t('count_stations', { n });
+        const extra = subFn ? subFn() : '';
+        return extra ? `${count} · ${extra}` : count;
+      });
       renderGrid();
-      return list.length;
+      return n;
     } catch (err) {
       if (reqId !== state.requestId) return -1;
       state.list = [];
-      setHeader(title, '');
-      setGridMessage(`Liste alınamadı: ${errorText(err)}`);
+      setHeader(titleFn, () => '');
+      setGridMessage('list_error', { msg: errorText(err) });
       return -1;
     }
   }
@@ -248,15 +311,15 @@
     const grid = $('stationGrid');
     if (!state.list.length) {
       grid.replaceChildren();
-      const text = state.view === 'favorites'
-        ? 'Henüz favori yok. Bir istasyonun yıldız işaretine tıklayın.'
+      const key = state.view === 'favorites'
+        ? 'no_favorites'
         : state.view === 'recent'
-          ? 'Henüz dinlenen istasyon yok.'
-          : 'Bu listede istasyon bulunamadı.';
-      setGridMessage(text);
+          ? 'no_recent'
+          : 'no_stations';
+      setGridMessage(key);
       return;
     }
-    clearGridMessage();
+    setGridMessage(null);
     grid.replaceChildren(...state.list.map(stationCard));
     refreshMarks();
   }
@@ -281,7 +344,7 @@
         role: 'button',
         tabindex: '0',
         'data-uuid': station.uuid,
-        'aria-label': `${station.name} istasyonunu çal`,
+        'aria-label': t('play_station', { name: station.name }),
         onclick: () => playFromList(station),
         onkeydown: (event) => {
           // Yalnızca kartın kendisi odaktayken; ★ düğmesindeki Enter kart oynatmasın.
@@ -312,7 +375,7 @@
       const fav = card.querySelector('.fav');
       const isFav = state.favIds.has(uuid);
       fav.classList.toggle('on', isFav);
-      fav.title = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
+      fav.title = isFav ? t('fav_remove') : t('fav_add');
       fav.setAttribute('aria-pressed', String(isFav));
       fav.replaceChildren(icon(isFav ? 'star-fill' : 'star'));
     });
@@ -322,38 +385,51 @@
 
   async function renderBrowse() {
     const list = $('browseList');
-    list.replaceChildren(el('li', { class: 'muted pad', text: 'Yükleniyor…' }));
+    list.replaceChildren(el('li', { class: 'muted pad', text: t('loading') }));
     try {
       if (state.browseMode === 'countries') {
-        state.countries ??= await window.radio.countries();
-        state.browseItems = state.countries.map((c) => ({
-          key: `country:${c.code}`,
-          label: c.name,
-          badge: c.code,
-          count: c.count,
-          onPick: () => loadStations({ type: 'country', value: c.code }, c.name, ''),
-        }));
+        state.browseData.countries ??= await window.radio.countries();
       } else {
-        state.tags ??= await window.radio.tags();
-        state.browseItems = state.tags.map((t) => ({
-          key: `tag:${t.name}`,
-          label: capitalize(t.name),
-          count: t.count,
-          onPick: () => loadStations({ type: 'tag', value: t.name }, capitalize(t.name), ''),
-        }));
+        state.browseData.tags ??= await window.radio.tags();
       }
+      buildBrowseItems();
       filterBrowse();
     } catch (err) {
-      list.replaceChildren(el('li', { class: 'muted pad', text: `Liste alınamadı: ${errorText(err)}` }));
+      list.replaceChildren(el('li', { class: 'muted pad', text: t('list_error', { msg: errorText(err) }) }));
+    }
+  }
+
+  /** Veriden gezgin öğelerini (seçili dilde adlarla) üretir. */
+  function buildBrowseItems() {
+    if (state.browseMode === 'countries') {
+      state.browseItems = (state.browseData.countries || [])
+        .map((c) => {
+          const name = regionName(c.code) || c.name;
+          return {
+            key: `country:${c.code}`,
+            label: name,
+            badge: c.code,
+            count: c.count,
+            onPick: () => loadStations({ type: 'country', value: c.code }, () => regionName(c.code) || c.name, null),
+          };
+        })
+        .sort((a, b) => a.label.localeCompare(b.label, state.lang));
+    } else {
+      state.browseItems = (state.browseData.tags || []).map((tag) => ({
+        key: `tag:${tag.name}`,
+        label: capitalize(tag.name),
+        count: tag.count,
+        onPick: () => loadStations({ type: 'tag', value: tag.name }, () => capitalize(tag.name), null),
+      }));
     }
   }
 
   function filterBrowse() {
-    const query = $('browseFilter').value.trim().toLocaleLowerCase('tr');
-    const items = state.browseItems.filter((it) => !query || it.label.toLocaleLowerCase('tr').includes(query));
+    const query = $('browseFilter').value.trim().toLocaleLowerCase(state.lang);
+    const items = state.browseItems.filter((it) => !query || it.label.toLocaleLowerCase(state.lang).includes(query));
     const list = $('browseList');
     if (!items.length) {
-      list.replaceChildren(el('li', { class: 'muted pad', text: 'Eşleşen yok' }));
+      list.replaceChildren(el('li', { class: 'muted pad', text: t('no_match') }));
       return;
     }
     list.replaceChildren(...items.map((item) => el(
@@ -410,28 +486,57 @@
     play(state.queue[state.queueIndex]);
   }
 
-  function startAudio(station) {
+  /** Yayını başlatır. Düz akışlar yerel aktarıcıdan, HLS yayınlar hls.js ile çalar. */
+  async function startAudio(station) {
     destroyHls();
+    const session = ++state.session;
     audio.volume = state.volume;
+    audio.muted = state.muted;
 
     if (HLS_RE.test(station.url) && window.Hls && window.Hls.isSupported()) {
-      const hls = new window.Hls({ enableWorker: true });
-      hls.on(window.Hls.Events.ERROR, (_event, data) => {
-        if (data.fatal) handleFailure();
-      });
-      hls.loadSource(station.url);
-      hls.attachMedia(audio);
-      state.hls = hls;
-    } else {
-      audio.src = station.url;
+      attachHls(station);
+      return;
     }
 
+    let src = station.url;
+    try {
+      src = await window.radio.openStream(station.url);
+    } catch {
+      src = station.url; // aktarıcı kullanılamazsa doğrudan dene (şarkı bilgisi olmaz)
+    }
+    if (session !== state.session || state.status === 'stopped') return;
+
+    audio.src = src;
+    playAudio();
+  }
+
+  function playAudio() {
     const playing = audio.play();
     if (playing && playing.catch) {
       playing.catch((err) => {
         if (err.name !== 'AbortError') handleFailure();
       });
     }
+  }
+
+  function attachHls(station) {
+    const hls = new window.Hls({ enableWorker: true });
+    hls.on(window.Hls.Events.ERROR, (_event, data) => {
+      if (data.fatal) handleFailure();
+    });
+    // HLS yayınlarında şarkı bilgisi ID3 etiketleriyle gelir
+    hls.on(window.Hls.Events.FRAG_PARSING_METADATA, (_event, data) => {
+      for (const sample of data.samples || []) {
+        const info = ID3.parseId3(sample.data);
+        if (!info) continue;
+        const raw = info.artist && info.title ? `${info.artist} - ${info.title}` : (info.title || info.artist);
+        if (raw) window.radio.reportTitle(raw);
+      }
+    });
+    hls.loadSource(station.url);
+    hls.attachMedia(audio);
+    state.hls = hls;
+    playAudio();
   }
 
   function destroyHls() {
@@ -464,6 +569,7 @@
   }
 
   function stop() {
+    state.session++; // bekleyen başlatmaları iptal et
     setStatus('stopped');
     clearRetry();
     destroyHls();
@@ -480,7 +586,7 @@
     return undefined;
   }
 
-  /** Ana süreçten (görev çubuğu, tepsi, medya tuşları, MPRIS) gelen komutlar. */
+  /** Ana süreçten (görev çubuğu, tepsi, medya tuşları, jump list, MPRIS) gelen komutlar. */
   function handleControl(action) {
     switch (action) {
       case 'toggle':
@@ -524,15 +630,15 @@
   function statusText() {
     switch (state.status) {
       case 'playing':
-        return `CANLI · ${fmtElapsed(Date.now() - state.startedAt)}`;
+        return t('st_playing', { t: fmtElapsed(Date.now() - state.startedAt) });
       case 'loading':
-        return 'Bağlanıyor…';
+        return t('st_loading');
       case 'buffering':
-        return 'Tamponlanıyor…';
+        return t('st_buffering');
       case 'error':
-        return 'Bağlantı kurulamadı';
+        return t('st_error');
       default:
-        return state.current ? 'Durduruldu' : '';
+        return state.current ? t('st_stopped') : '';
     }
   }
 
@@ -574,27 +680,33 @@
 
   function renderPlayer() {
     const s = state.current;
-    $('npTitle').textContent = s ? (state.np.title || s.name) : 'Bir istasyon seçin';
-    $('npSub').textContent = s ? npSubtitle() : 'Soldan bir ülke veya listeden bir istasyon seçin';
+    $('npTitle').textContent = s ? (state.np.title || s.name) : t('player_empty_title');
+    $('npSub').textContent = s ? npSubtitle() : t('player_empty_sub');
     renderArt();
     renderStatusLine();
 
     const active = ACTIVE.has(state.status);
     const playBtn = $('playBtn');
     playBtn.replaceChildren(icon(active ? 'pause' : 'play'));
-    playBtn.setAttribute('aria-label', active ? 'Durdur' : 'Oynat');
-    playBtn.title = active ? 'Durdur (Boşluk)' : 'Oynat (Boşluk)';
+    playBtn.setAttribute('aria-label', active ? t('stop') : t('play'));
+    playBtn.title = active ? t('stop_hint') : t('play_hint');
 
     const multi = state.queue.length > 1;
-    $('prevBtn').disabled = !multi;
-    $('nextBtn').disabled = !multi;
+    const prev = $('prevBtn');
+    const next = $('nextBtn');
+    prev.disabled = !multi;
+    next.disabled = !multi;
+    prev.setAttribute('aria-label', t('prev'));
+    prev.title = t('prev_hint');
+    next.setAttribute('aria-label', t('next'));
+    next.title = t('next_hint');
 
     const fav = $('favCurrent');
     const isFav = Boolean(s) && state.favIds.has(s.uuid);
     fav.disabled = !s;
     fav.classList.toggle('on', isFav);
     fav.replaceChildren(icon(isFav ? 'star-fill' : 'star'));
-    fav.title = isFav ? 'Favorilerden çıkar' : 'Favorilere ekle';
+    fav.title = isFav ? t('fav_remove') : t('fav_add');
     fav.setAttribute('aria-label', fav.title);
 
     updateMediaSession();
@@ -632,8 +744,23 @@
       state.list = state.favorites;
       renderGrid();
     }
+    renderHeader();
     refreshMarks();
     renderPlayer();
+  }
+
+  // ------------------------------------------------------------ sessize alma
+
+  /** Sesi kapatır/açar. Kaydırıcı değeri korunur; açınca aynı seviyeden devam eder. */
+  function applyMute(muted) {
+    state.muted = Boolean(muted);
+    audio.muted = state.muted;
+    const btn = $('muteBtn');
+    btn.classList.toggle('muted', state.muted);
+    btn.setAttribute('aria-pressed', String(state.muted));
+    btn.setAttribute('aria-label', state.muted ? t('unmute') : t('mute'));
+    btn.title = state.muted ? t('unmute_hint') : t('mute_hint');
+    btn.replaceChildren(icon(state.muted ? 'volume-off' : 'volume'));
   }
 
   // ------------------------------------------------------------ sistem medya oturumu
@@ -665,23 +792,9 @@
     navigator.mediaSession.metadata = new MediaMetadata({
       title: state.np.title || s.name,
       artist: state.np.artist || s.name,
-      album: 'Radyn',
+      album: t('album'),
       artwork: artSrc ? [{ src: artSrc }] : [],
     });
-  }
-
-  // ------------------------------------------------------------ sessize alma
-
-  /** Sesi kapatır/açar. Kaydırıcı değeri korunur; açınca aynı seviyeden devam eder. */
-  function applyMute(muted) {
-    state.muted = Boolean(muted);
-    audio.muted = state.muted;
-    const btn = $('muteBtn');
-    btn.classList.toggle('muted', state.muted);
-    btn.setAttribute('aria-pressed', String(state.muted));
-    btn.setAttribute('aria-label', state.muted ? 'Sesi aç' : 'Sessize al');
-    btn.title = state.muted ? 'Sesi aç (M)' : 'Sessize al (M)';
-    btn.replaceChildren(icon(state.muted ? 'volume-off' : 'volume'));
   }
 
   // ------------------------------------------------------------ tema
@@ -710,6 +823,8 @@
 
     $('browseFilter').addEventListener('input', filterBrowse);
 
+    $('langSelect').addEventListener('change', (event) => setLang(event.target.value));
+
     $('searchForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const query = $('searchInput').value.trim();
@@ -717,7 +832,7 @@
       state.view = 'search';
       setActiveNav(null);
       clearBrowseActive();
-      loadStations({ type: 'search', value: query }, `“${query}” araması`, 'dünya genelinde');
+      loadStations({ type: 'search', value: query }, () => t('search_title', { q: query }), () => t('search_sub'));
     });
 
     $('playBtn').addEventListener('click', toggle);
@@ -727,14 +842,14 @@
       if (state.current) toggleFavorite(state.current);
     });
 
+    $('muteBtn').addEventListener('click', () => applyMute(!state.muted));
+
     $('volume').addEventListener('input', (event) => {
       state.volume = clamp01(event.target.value);
       audio.volume = state.volume;
       window.radio.setSetting('volume', state.volume);
       if (state.muted && state.volume > 0) applyMute(false); // kaydırıcıyı oynatınca sesi aç
     });
-
-    $('muteBtn').addEventListener('click', () => applyMute(!state.muted));
 
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key.toLowerCase() === 'f') {
@@ -743,7 +858,7 @@
         return;
       }
       const tag = event.target && event.target.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
       if (event.code === 'Space') {
         event.preventDefault();
         toggle();
@@ -772,8 +887,11 @@
   // ------------------------------------------------------------ başlatma
 
   async function init() {
+    state.regionNames = makeRegionNames(state.lang);
+    applyStatic();
+
     if (!window.radio) {
-      setGridMessage('Uygulama köprüsü (preload) yüklenemedi.');
+      setGridMessage('bridge_error');
       return;
     }
 
@@ -783,6 +901,10 @@
     window.radio.onAccent(applyAccent);
     window.radio.getAccent().then(applyAccent).catch(() => {});
     setupMediaSession();
+
+    state.lang = I18N.resolveLang(await window.radio.getLang());
+    state.regionNames = makeRegionNames(state.lang);
+    applyStatic();
 
     const data = await window.radio.getStore();
     state.recent = data.recent;
@@ -795,7 +917,8 @@
     renderPlayer();
     renderBrowse();
     showView('home');
+    window.radio.ready(); // jump list komutu varsa şimdi çalıştırılır
   }
 
-  init().catch((err) => setGridMessage(`Başlatma hatası: ${errorText(err)}`));
+  init().catch((err) => setGridMessage('init_error', { msg: errorText(err) }));
 })();

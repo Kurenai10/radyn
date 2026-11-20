@@ -14,16 +14,23 @@ contextBridge.exposeInMainWorld('radio', {
   info: () => ipcRenderer.invoke('app:info'),
   countries: () => ipcRenderer.invoke('api:countries'),
   tags: () => ipcRenderer.invoke('api:tags'),
-  homeCountry: () => ipcRenderer.invoke('geo:home'),
   stations: (query) => ipcRenderer.invoke('api:stations', query),
+  homeCountry: () => ipcRenderer.invoke('geo:home'),
 
   getStore: () => ipcRenderer.invoke('store:get'),
   toggleFavorite: (station) => ipcRenderer.invoke('store:toggleFavorite', station),
   setSetting: (key, value) => ipcRenderer.send('store:setSetting', key, value),
 
+  getLang: () => ipcRenderer.invoke('lang:get'),
+  setLang: (lang) => ipcRenderer.send('lang:set', lang),
+
+  openStream: (url) => ipcRenderer.invoke('stream:open', url),
+  reportTitle: (raw) => ipcRenderer.send('metadata:title', raw),
+
   playStarted: (station) => ipcRenderer.send('play:started', station),
   playStopped: () => ipcRenderer.send('play:stopped'),
   reportState: (state) => ipcRenderer.send('state', state),
+  ready: () => ipcRenderer.send('renderer:ready'),
 
   getAccent: () => ipcRenderer.invoke('accent:get'),
 
