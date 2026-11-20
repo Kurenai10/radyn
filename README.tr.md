@@ -295,4 +295,4 @@ Hata bildirimleri, özellik önerileri ve pull request'ler memnuniyetle karşıl
 
 ## Lisans
 
-Henüz bir lisans seçilmedi. Bir lisans eklenene kadar tüm haklar yazara aittir.
+Bu proje [MIT Lisansı](LICENSE) ile lisanslanmıştır.

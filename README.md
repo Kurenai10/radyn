@@ -295,4 +295,4 @@ Bug reports, feature ideas and pull requests are welcome. See [CONTRIBUTING.md](
 
 ## License
 
-No license has been chosen yet. Until one is added, all rights are reserved by the author.
+This project is licensed under the [MIT License](LICENSE).
