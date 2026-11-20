@@ -108,7 +108,7 @@ fi
 
 TAG="$(printf '%s\n' "$JSON" | grep -o '"tag_name": *"[^"]*"' | head -n1 | sed 's/.*"\([^"]*\)"$/\1/')"
 APPIMAGE_URL="$(printf '%s\n' "$JSON" | grep -o '"browser_download_url": *"[^"]*\.AppImage"' | head -n1 | sed 's/.*"\(https[^"]*\)"$/\1/')"
-SUMS_URL="$(printf '%s\n' "$JSON" | grep -o '"browser_download_url": *"[^"]*SHA256SUMS[^"]*"' | head -n1 | sed 's/.*"\(https[^"]*\)"$/\1/')"
+SUMS_URL="$(printf '%s\n' "$JSON" | grep -o '"browser_download_url": *"[^"]*/SHA256SUMS\.txt"' | head -n1 | sed 's/.*"\(https[^"]*\)"$/\1/')"
 
 [ -n "$TAG" ] && [ -n "$APPIMAGE_URL" ] || die "Bu sürümde AppImage dosyası bulunamadı ($TAG)."
 [ -n "$SUMS_URL" ] || die "Bu sürümde SHA256SUMS dosyası yok; güvenlik nedeniyle kurulum durduruldu."
