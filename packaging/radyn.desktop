@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Radyn
+GenericName=Canlı radyo
+Comment=Dünyanın dört bir yanından canlı radyo istasyonları
+Exec=/home/USER/.local/share/radyn/radyn %U
+Icon=radyn
+Terminal=false
+Categories=AudioVideo;Audio;Player;
+Keywords=radyo;radio;music;
+StartupWMClass=Radyn

@@ -1,0 +1,80 @@
+{
+  "name": "radyn",
+  "productName": "Radyn",
+  "version": "1.0.0",
+  "description": "Dünyanın dört bir yanından canlı radyo — ülke kategorileri, favoriler, görev çubuğu entegrasyonu",
+  "author": "Radyn",
+  "desktopName": "radyn.desktop",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test",
+    "icons": "node scripts/make-icons.js",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux"
+  },
+  "dependencies": {
+    "hls.js": "^1.7.4"
+  },
+  "optionalDependencies": {
+    "mpris-service": "^2.1.2"
+  },
+  "devDependencies": {
+    "electron": "^45.4.1",
+    "electron-builder": "^26.18.0"
+  },
+  "build": {
+    "appId": "com.radyn.app",
+    "productName": "Radyn",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Radyn"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "AudioVideo",
+      "icon": "assets/icon.png",
+      "executableName": "radyn",
+      "synopsis": "Dünyanın dört bir yanından canlı radyo",
+      "maintainer": "Radyn",
+      "desktop": {
+        "entry": {
+          "Name": "Radyn",
+          "GenericName": "Canlı radyo",
+          "Comment": "Dünyanın dört bir yanından canlı radyo istasyonları",
+          "Categories": "AudioVideo;Audio;Player;",
+          "Keywords": "radyo;radio;music;müzik;",
+          "StartupWMClass": "Radyn",
+          "Terminal": "false"
+        }
+      }
+    }
+  }
+}

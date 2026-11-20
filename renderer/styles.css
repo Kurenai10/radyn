@@ -1,0 +1,539 @@
+/* ---------- Tasarım belirteçleri: açık / koyu tema, sistem tercihine göre ---------- */
+:root {
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-2: #e9ebef;
+  --surface-hover: #f1f3f6;
+  --text: #15181e;
+  --muted: #687080;
+  --border: rgba(15, 23, 42, 0.08);
+  --accent: #3b6cf6;
+  --accent-ink: #ffffff;
+  --gold: #f5b301;
+  --live: #e5484d;
+  --shadow: 0 6px 24px rgba(15, 23, 42, 0.08);
+  --radius: 12px;
+  --radius-sm: 8px;
+  color-scheme: light;
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Noto Sans", Ubuntu, Cantarell, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #15171c;
+    --surface: #1d2027;
+    --surface-2: #262a33;
+    --surface-hover: #242830;
+    --text: #eceef3;
+    --muted: #9098a8;
+    --border: rgba(255, 255, 255, 0.07);
+    --shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #15171c;
+  --surface: #1d2027;
+  --surface-2: #262a33;
+  --surface-hover: #242830;
+  --text: #eceef3;
+  --muted: #9098a8;
+  --border: rgba(255, 255, 255, 0.07);
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+/* ---------- Temel ---------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+}
+.hidden { display: none !important; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.muted { color: var(--muted); }
+.ic { width: 18px; height: 18px; flex: none; }
+
+button:focus-visible,
+input:focus-visible,
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+/* ---------- Düzen ---------- */
+.app {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+/* ---------- Kenar çubuğu ---------- */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 18px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  font-weight: 650;
+  font-size: 15px;
+}
+.brand-logo {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  object-fit: contain;
+}
+.brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  display: grid;
+  place-items: center;
+}
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-item,
+.browse-btn,
+.seg-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+}
+.nav-item:hover,
+.browse-btn:hover { background: var(--surface-hover); }
+.nav-item.active,
+.browse-btn.active {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--accent);
+}
+.count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.browse-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  gap: 8px;
+}
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.seg {
+  display: flex;
+  background: var(--surface-2);
+  border-radius: 8px;
+  padding: 2px;
+}
+.seg-btn {
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.seg-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+.field {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: inherit;
+  outline: none;
+  user-select: text;
+}
+.field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.field.small { padding: 7px 10px; font-size: 13px; }
+.browse-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 2px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.browse-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 13px;
+}
+.browse-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.code-badge {
+  flex: none;
+  width: 28px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+.pad { padding: 8px; font-size: 13px; }
+
+/* ---------- Ana alan ---------- */
+.main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px 12px;
+}
+.titles { flex: 1; min-width: 0; }
+h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.titles p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.search {
+  position: relative;
+  width: min(340px, 40%);
+  flex: none;
+}
+.search .ic {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+.search .field { padding-left: 34px; }
+
+.grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 24px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+  gap: 12px;
+  align-content: start;
+}
+.grid:empty { display: none; }
+.empty {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  text-align: center;
+  padding: 24px;
+}
+
+/* ---------- İstasyon kartı ---------- */
+.card {
+  position: relative;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover {
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+.card.current { border-color: color-mix(in srgb, var(--accent) 60%, transparent); }
+.card-top {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.logo {
+  width: 52px;
+  height: 52px;
+  flex: none;
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 700;
+}
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.fav {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.fav:hover,
+.fav.on { color: var(--gold); }
+.fav .ic { width: 18px; height: 18px; }
+.card-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.card-meta {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Çalan kartta ekolayzır animasyonu */
+.eq {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding-bottom: 12px;
+  pointer-events: none;
+}
+.card.playing .eq { display: flex; }
+.eq i {
+  width: 4px;
+  height: 30%;
+  border-radius: 2px;
+  background: #fff;
+  animation: eq 0.9s ease-in-out infinite;
+}
+.eq i:nth-child(2) { animation-delay: 0.15s; }
+.eq i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes eq {
+  0%, 100% { height: 25%; }
+  50% { height: 90%; }
+}
+
+/* ---------- Alt oynatıcı çubuğu ---------- */
+.player {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.now {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.art {
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface-2);
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+.art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.art .ic { width: 24px; height: 24px; }
+.meta { min-width: 0; flex: 1; }
+.np-title {
+  font-weight: 650;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.np-sub {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.icon-btn,
+.play-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transition: background 0.15s, transform 0.1s, opacity 0.15s;
+}
+.icon-btn { width: 36px; height: 36px; }
+.icon-btn:hover:not(:disabled) { background: var(--surface-2); }
+.icon-btn:disabled { opacity: 0.35; cursor: default; }
+#favCurrent.on { color: var(--gold); }
+#favCurrent .ic { width: 20px; height: 20px; }
+.play-btn {
+  width: 50px;
+  height: 50px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.play-btn:hover { filter: brightness(1.06); }
+.play-btn:active { transform: scale(0.96); }
+.play-btn .ic { width: 22px; height: 22px; }
+.side {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  min-width: 0;
+}
+.status {
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.status.live {
+  color: var(--live);
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+.volume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+.volume .ic { width: 16px; height: 16px; }
+.mute-btn {
+  width: 30px;
+  height: 30px;
+  color: var(--muted);
+}
+.mute-btn:hover { color: var(--text); }
+.mute-btn.muted { color: var(--accent); }
+.mute-btn .ic { width: 17px; height: 17px; }
+input[type="range"] {
+  width: 110px;
+  accent-color: var(--accent);
+}
+
+/* ---------- Dar pencere ---------- */
+@media (max-width: 960px) {
+  .app { grid-template-columns: 210px minmax(0, 1fr); }
+  .player { grid-template-columns: minmax(0, 1fr) auto; }
+  .side .volume input { width: 70px; }
+  .status { display: none; }
+}
