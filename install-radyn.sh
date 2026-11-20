@@ -176,9 +176,10 @@ chmod 644 "$DESKTOP_FILE"
 # Mevcut bağlantı/dosya kaldırılır: üstüne yazmak (symlink üzerinden) AppImage'ı bozabilir.
 rm -f "$BIN_DIR/radyn"
 if [ -n "$SANDBOX_FLAG" ]; then
-  printf '#!/bin/sh
-exec "%s"%s "$@"
-' "$APPIMAGE" "$SANDBOX_FLAG" > "$BIN_DIR/radyn"
+  cat > "$BIN_DIR/radyn" <<EOF
+#!/bin/sh
+exec "$APPIMAGE"$SANDBOX_FLAG "\$@"
+EOF
   chmod +x "$BIN_DIR/radyn"
 else
   ln -s "$APPIMAGE" "$BIN_DIR/radyn"
