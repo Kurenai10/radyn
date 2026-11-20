@@ -86,7 +86,7 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 
 ### Adımlar
 
-1. Sürüm sayfasından **`Radyn Setup 1.0.0.exe`** dosyasını indirin.
+1. [Sürüm sayfasından](https://github.com/Kurenai10/radyn/releases/tag/v1.0.0) **`Radyn.Setup.1.0.0.exe`** dosyasını indirin. (GitHub, dosya adındaki boşlukları noktaya çevirir; indirdiğiniz ad bu olabilir.)
 2. Dosyaya çift tıklayın. Windows **"Windows PC'nizi korudu"** uyarısı gösterirse:
    - **Ek bilgi** bağlantısına tıklayın,
    - **Yine de çalıştır** düğmesine basın.
@@ -105,7 +105,7 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, tür filtr
 PowerShell'de:
 
 ```powershell
-Get-FileHash ".\Radyn Setup 1.0.0.exe" -Algorithm SHA256
+Get-FileHash ".\Radyn.Setup.1.0.0.exe" -Algorithm SHA256
 ```
 
 Çıktı, sürüm notlarında yayınlanan özetle aynı olmalıdır.
@@ -497,7 +497,7 @@ Bir sorun çözülmediyse şu bilgileri toplayın (bunlar kişisel veri içermez
 
 1. **Sürüm ve sistem:** Windows sürümü (ör. 10 22H2, 11 23H2) ya da Linux dağıtımı ve sürümü (`lsb_release -a`), CPU mimarisi.
 2. **Radyn sürümü:** Ayarlar → Uygulamalar listesinde ya da kurulum klasöründeki `package.json`'daki `version`.
-3. **Kaynak:** Kurulum dosyası (`Radyn Setup 1.0.0.exe`), paketli klasör veya `npm start`.
+3. **Kaynak:** Kurulum dosyası (`Radyn.Setup.1.0.0.exe`), paketli klasör veya `npm start`.
 4. **Adımlar:** Hatayı tetikleyen işlemler (ör. "Türkiye kategorisine tıkladım, 500 istasyon geldi, bir istasyonu çalınca 'Bağlantı kurulamadı' çıktı").
 5. **Ekran mesajı:** Durum satırındaki ya da listedeki kırmızı/gri hata metni (tam olarak).
 6. **Terminal çıktısı:** `npm start` ile başlatılmış bir oturumda hata satırları (`Error`, `ERR`, `MPRIS`, `Veriler kaydedilemedi` gibi).
@@ -601,7 +601,7 @@ Kurulum dosyası **imzalanmamıştır**. Yayın için kod imzalama sertifikası 
 
 ## Sürüm notları
 
-Ayrıntılar için [RELEASE_NOTES.md](RELEASE_NOTES.md) dosyasına bakın.
+Ayrıntılar ve indirme bağlantısı için [RELEASE_NOTES.md](RELEASE_NOTES.md) dosyasına ve [Sürümler sayfasına](https://github.com/Kurenai10/radyn/releases) bakın.
 
 ## Lisans
 

@@ -6,12 +6,12 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, arama, fav
 
 | Dosya | Açıklama | SHA-256 |
 |---|---|---|
-| `Radyn Setup 1.0.0.exe` | Windows 10/11 (x64) kurulum dosyası | `6ff9071676e4ed82c81da1ec4aa3fbdc6dd9f59cdb3913a958ecdd1e66c857ce` |
+| `Radyn.Setup.1.0.0.exe` | Windows 10/11 (x64) kurulum dosyası | `6ff9071676e4ed82c81da1ec4aa3fbdc6dd9f59cdb3913a958ecdd1e66c857ce` |
 
 Doğrulama (PowerShell):
 
 ```powershell
-Get-FileHash ".\Radyn Setup 1.0.0.exe" -Algorithm SHA256
+Get-FileHash ".\Radyn.Setup.1.0.0.exe" -Algorithm SHA256
 ```
 
 > **Not:** Kurulum dosyası dijital olarak imzalanmamıştır. Windows "Windows PC'nizi korudu" uyarısı gösterirse **Ek bilgi → Yine de çalıştır** seçeneğini kullanın.
