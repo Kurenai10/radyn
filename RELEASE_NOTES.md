@@ -9,7 +9,8 @@ Dünyanın dört bir yanından canlı radyo. Ülke ülke kategoriler, arama, fav
 | `Radyn-Setup-1.1.0.exe` | Windows 10/11 (x64) kurulum dosyası |
 | `Radyn-1.1.0.AppImage` | Linux (x64), taşınabilir |
 | `radyn_1.1.0_amd64.deb` | Linux (x64), Debian/Ubuntu |
-| `SHA256SUMS.txt` | Tüm dosyaların SHA-256 özetleri |
+| `install-radyn.sh` | Linux tek komutla kurulum betiği (AppImage'ı indirir, doğrular, kurar) |
+| `SHA256SUMS.txt` | Tüm dosyaların SHA-256 özetleri (betik dahil) |
 
 Doğrulama:
 
@@ -23,7 +24,14 @@ Get-FileHash ".\Radyn-Setup-1.1.0.exe" -Algorithm SHA256
 sha256sum -c SHA256SUMS.txt --ignore-missing
 ```
 
-Linux'ta tek komutla kurmak için depodaki `install-radyn.sh` betiğini kullanabilirsiniz: `bash install-radyn.sh`. Ayrıntılar README'dedir.
+Linux'ta tek komutla kurmak için bu sürümdeki `install-radyn.sh` dosyasını indirip çalıştırın:
+
+```bash
+curl -fsSLO https://github.com/Kurenai10/radyn/releases/download/v1.1.0/install-radyn.sh
+bash install-radyn.sh
+```
+
+Betik en son sürümün AppImage dosyasını indirir, `SHA256SUMS.txt` ile doğrular ve uygulama menüsüne ekler. Belirli bir sürüm için `--version v1.1.0`, kaldırmak için `--uninstall` kullanabilirsiniz. Ayrıntılar README'dedir.
 
 > **Not:** Windows kurulum dosyası şu an sertifikayla imzalı değildir. "Windows PC'nizi korudu" uyarısı görürseniz **Ek bilgi → Yine de çalıştır** seçeneğini kullanın. Sertifika tanımlandığında sonraki sürümler imzalanacaktır.
 

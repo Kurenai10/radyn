@@ -129,6 +129,8 @@ curl -fsSLO https://raw.githubusercontent.com/Kurenai10/radyn/main/install-radyn
 bash install-radyn.sh
 ```
 
+Ya da [sürüm sayfasındaki](https://github.com/Kurenai10/radyn/releases/tag/v1.1.0) `install-radyn.sh` dosyasını indirip aynı şekilde çalıştırabilirsiniz.
+
 Betik şunları yapar:
 
 - En son sürümü bulur ve `Radyn-1.1.0.AppImage` dosyasını indirir.
