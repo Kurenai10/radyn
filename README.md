@@ -169,7 +169,7 @@ npm start
 
 - **Medya kontrolü:** MPRIS üzerinden GNOME/KDE medya panelinde ve kilit ekranında çalışır.
 - **Tepsi:** GNOME'da simge görünmesi için **AppIndicator and KStatusNotifierItem Support** eklentisi gerekir. Eklenti yoksa da uygulama açılır; ikinci kopya açmak pencereyi öne getirir.
-- **Sandbox:** Ubuntu 24.04 ve benzeri dağıtımlar Electron'un sandbox'ını kısıtlayabilir (`No usable sandbox`). Sürüm derlemeleri bu nedenle sürekli entegrasyon ortamında duman testinden geçer. `--no-sandbox` bayrağı güvenliği düşürdüğü için varsayılan olarak kullanılmaz.
+- **Sandbox:** Kurulum betiği, kullanıcı ad alanları kısıtlıysa (Ubuntu 24.04+ gibi) Chromium sandbox'ının açılamadığını algılar; yalnızca bu durumda uygulamayı `--no-sandbox` ile açar ve bunu uyarıyla bildirir. Kısıt yoksa sandbox açık kalır.
 
 ---
 
@@ -345,7 +345,7 @@ sudo apt install libnss3 libatk-bridge2.0-0 libgtk-3-0 libasound2 libxss1 libgbm
 Hata mesajındaki `libXXX.so` adını arayıp (`apt search libxxx`) paketi bulabilirsiniz.
 
 #### Linux: `No usable sandbox!` veya uygulama açılmadan kapanıyor
-Ubuntu 23.10/24.04 gibi dağıtımlar kullanıcı ad alanlarını AppArmor ile kısıtlayabilir. Güvenli çözüm, sistem yöneticinizle birlikte Electron için bir AppArmor profili tanımlamaktır. `--no-sandbox` bayrağı güvenliği düşürdüğü için yalnızca kendi makinenizde ve bilerek kullanın.
+Ubuntu 23.10/24.04 gibi dağıtımlar kullanıcı ad alanlarını AppArmor ile kısıtlayabilir. `install-radyn.sh` bunu algılar ve uygulamayı `--no-sandbox` ile açar (uyarı verir). Daha güvenli çözüm, sistem yöneticinizle birlikte Electron için bir AppArmor profili tanımlamaktır; bu durumda betiği yeniden çalıştırmak sandbox'ı açık bırakır. `--no-sandbox` kullanımı, uygulamanın kendi arayüzünü çalıştırmasıyla sınırlı olsa da güvenliği düşürür.
 
 #### Linux: `Permission denied`
 ```bash

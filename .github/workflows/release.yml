@@ -43,6 +43,11 @@ jobs:
       - name: Linux paketlerini derle (dizin, AppImage, deb)
         run: npx electron-builder --linux dir AppImage deb --publish never
 
+      - name: Chrome sandbox izinleri (kurulumdaki gibi SUID)
+        run: |
+          sudo chown root:root dist/linux-unpacked/chrome-sandbox
+          sudo chmod 4755 dist/linux-unpacked/chrome-sandbox
+
       - name: Duman testi (sanal ekranda 30 saniye çalıştır)
         run: |
           sudo apt-get update

@@ -50,6 +50,19 @@ uninstall() {
   exit 0
 }
 
+# Kullanıcı ad alanları kısıtlıysa (Ubuntu 24.04+ gibi, AppArmor ile) Chromium sandbox'ı
+# başlatamaz ve uygulama açılmaz. Yalnızca bu durumda --no-sandbox kullanılır.
+userns_restricted() {
+  local f
+  f=/proc/sys/kernel/apparmor_restrict_unprivileged_userns
+  if [ -r "$f" ] && [ "$(cat "$f")" = "1" ]; then return 0; fi
+  f=/proc/sys/kernel/unprivileged_userns_clone
+  if [ -r "$f" ] && [ "$(cat "$f")" = "0" ]; then return 0; fi
+  f=/proc/sys/user/max_user_namespaces
+  if [ -r "$f" ] && [ "$(cat "$f")" = "0" ]; then return 0; fi
+  return 1
+}
+
 # ---------------------------------------------------------------- argümanlar
 
 VERSION=""
@@ -136,13 +149,22 @@ if ! ldconfig -p 2>/dev/null | grep -q 'libfuse\.so\.2'; then
   EXEC_PREFIX="env APPIMAGE_EXTRACT_AND_RUN=1 "
 fi
 
+SANDBOX_FLAG=""
+if userns_restricted; then
+  SANDBOX_FLAG=" --no-sandbox"
+  warn "Bu sistemde kullanıcı ad alanları kısıtlı; Chromium sandbox'ı açılamaz."
+  warn "Radyn --no-sandbox ile açılacak (sistem güvenliğini biraz düşürür)."
+  warn "Sandbox'ı açmak için sistem yöneticinizle AppArmor profili tanımlayabilirsiniz (README: Linux)."
+fi
+
+rm -f "$DESKTOP_FILE"
 cat > "$DESKTOP_FILE" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Radyn
 GenericName=Canlı radyo
 Comment=Dünyanın dört bir yanından canlı radyo istasyonları
-Exec=${EXEC_PREFIX}"${APPIMAGE}" %U
+Exec=${EXEC_PREFIX}"${APPIMAGE}"${SANDBOX_FLAG} %U
 Icon=${ICON_FILE}
 Terminal=false
 Categories=AudioVideo;Audio;Player;
@@ -151,7 +173,16 @@ StartupWMClass=Radyn
 EOF
 chmod 644 "$DESKTOP_FILE"
 
-ln -sf "$APPIMAGE" "$BIN_DIR/radyn"
+# Mevcut bağlantı/dosya kaldırılır: üstüne yazmak (symlink üzerinden) AppImage'ı bozabilir.
+rm -f "$BIN_DIR/radyn"
+if [ -n "$SANDBOX_FLAG" ]; then
+  printf '#!/bin/sh
+exec "%s"%s "$@"
+' "$APPIMAGE" "$SANDBOX_FLAG" > "$BIN_DIR/radyn"
+  chmod +x "$BIN_DIR/radyn"
+else
+  ln -s "$APPIMAGE" "$BIN_DIR/radyn"
+fi
 
 if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "$APPS_DIR" >/dev/null 2>&1 || true
